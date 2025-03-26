@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seconds to Survive</title>
+  <style>
+    /* General Styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1c0032;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: url('23982.jpg') no-repeat center center fixed;
+  background-size: cover;
+
+    }
+    body {
+    font-family: 'Press Start 2P', cursive;
+    background: linear-gradient(135deg, #1c0032, #4b0082, #6a0dad);
+    background-size: 400% 400%;
+    animation: backgroundShift 8s ease infinite;
+}
+
+@keyframes backgroundShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.container, .game-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px); /* Frosted glass effect */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+}
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px);
+    background-size: 30px 30px;
+    z-index: -1;
+    opacity: 0.5;
+    animation: floatParticles 20s linear infinite;
+}
+
+@keyframes floatParticles {
+    from { transform: translateY(0px); }
+    to { transform: translateY(-100px); }
+}
+body {
+    perspective: 1000px;
+}
+
+.container {
+    transform: translateZ(0);
+    transition: transform 0.3s ease;
+}
+
+body:hover .container {
+    transform: translateZ(50px);
+}
+.container::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #ff00ff, #ff4500, #ffd700);
+    z-index: -1;
+    filter: blur(10px);
+    opacity: 0.6;
+}
+
+
+
+    /* Main Page Styling */
+    .main-container {
+      text-align: center;
+      width: 90%;
+      max-width: 800px;
+      background-color: #4b0082;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .main-title {
+      font-size: 48px;
+      font-weight: bold;
+      color: #ffd700;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .sub-title {
+      font-size: 24px;
+      color: #ffffff;
+      margin-bottom: 40px;
+    }
+
+    .proceed-btn {
+      background-color: #6a0dad;
+      color: #ffffff;
+      padding: 14px 30px;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 0 20px rgba(106, 13, 173, 0.6);
+    }
+
+    .proceed-btn:hover {
+      background-color: #8a2be2;
+      transform: translateY(-3px);
+    }
+
+    /* Selection Container */
+    .selection-container {
+      display: none;
+      text-align: center;
+      width: 90%;
+      max-width: 900px;
+    }
+
+    .title {
+      font-size: 32px;
+      color: #ffd700;
+      margin-bottom: 20px;
+    }
+
+    /* Category Grid */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .category-card {
+      background-color: #4b0082;
+      border: 2px solid #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .category-card.selected {
+      background-color: #ffd700;
+      color: #1c0032;
+    }
+
+    .category-card:hover {
+      background-color: #6a0dad;
+      transform: translateY(-5px);
+    }
+
+    .category-header {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .category-status {
+      font-size: 16px;
+      background-color: #ffd700;
+      color: #1c0032;
+      padding: 5px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    /* Sub-Category Container */
+    .subcategory-container {
+      display: none;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .subcategory-card {
+      background-color: #4b0082;
+      border: 2px solid #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .subcategory-card:hover {
+      background-color: #6a0dad;
+      transform: translateY(-3px);
+    }
+
+    /* Quiz Container */
+    .quiz-container {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background-color: #4b0082;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .question {
+      font-size: 24px;
+      margin-bottom: 20px;
+      background-color: #5a007a;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .option {
+      background-color: #6a0dad;
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      padding: 12px;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .option.correct {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    .option.wrong {
+      background-color: #dc3545;
+      border-color: #dc3545;
+    }
+
+    .option:hover {
+      background-color: #8a2be2;
+    }
+    /* Fade-In and Fade-Out Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Slide-In Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Main Container Transition */
+.main-container, .selection-container, .subcategory-container, .quiz-container {
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+/* Category Cards - Slide-In */
+.category-card {
+    animation: slideIn 0.5s ease forwards;
+    opacity: 0;
+}
+
+/* Add slight delay for staggered effect */
+.category-card:nth-child(1) { animation-delay: 0.1s; }
+.category-card:nth-child(2) { animation-delay: 0.2s; }
+.category-card:nth-child(3) { animation-delay: 0.3s; }
+
+/* Button Hover Animation */
+.proceed-btn, .game-btn {
+    background-color: #6a0dad;
+    color: white;
+    padding: 14px 30px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 0 20px rgba(106, 13, 173, 0.6);
+}
+
+.proceed-btn:hover, .game-btn:hover {
+    background-color: #8a2be2;
+    transform: translateY(-3px);
+}
+
+/* Fade-Out Class (JS Triggered) */
+.fade-out {
+    animation: fadeOut 0.5s ease forwards;
+}
+
+/* Input Field Focus Animation */
+.container input:focus {
+    border-color: #ffd700;
+    transition: border-color 0.3s ease;
+}
+@keyframes fadeOutScale {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+/* Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Apply the animations */
+.fade-out {
+    animation: fadeOutScale 0.5s ease forwards;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+.back-btn {
+    background-color: #6a0dad;
+    color: white;
+    padding: 12px 28px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 0 15px rgba(106, 13, 173, 0.6);
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.back-btn:hover {
+    background-color: #8a2be2;
+    transform: translateY(-3px);
+}
+
+.back-btn:active {
+    background-color: #5a007a;
+    transform: translateY(0);
+}
+
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Category Container */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+/* Pagination Buttons */
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.pagination-btn {
+    background-color: #6a0dad;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 0 15px rgba(106, 13, 173, 0.6);
+}
+
+.pagination-btn:hover {
+    background-color: #8a2be2;
+    transform: translateY(-2px);
+}
+
+.pagination-btn:disabled {
+    background-color: #5a007a;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+/* Fun Neon Glow */
+@keyframes neonGlow {
+    0% { text-shadow: 0 0 10px #ffd700, 0 0 20px #ff8c00, 0 0 30px #ff4500; }
+    50% { text-shadow: 0 0 15px #ffd700, 0 0 25px #ff8c00, 0 0 35px #ff4500; }
+    100% { text-shadow: 0 0 10px #ffd700, 0 0 20px #ff8c00, 0 0 30px #ff4500; }
+}
+
+/* Glowing Title */
+.main-title {
+    animation: neonGlow 0.5s infinite alternate;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Pulse Animation for Proceed Button */
+.proceed-btn {
+    animation: pulse 1.5s infinite;
+    font-family: 'Press Start 2P', cursive;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 15px #ff4500; }
+    50% { box-shadow: 0 0 30px #ff6347; }
+    100% { box-shadow: 0 0 15px #ff4500; }
+}
+
+/* Floating Particles for Background */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('particles.png') repeat;
+    animation: particleMove 30s linear infinite;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+@keyframes particleMove {
+    from { background-position: 0 0; }
+    to { background-position: 100% 100%; }
+}
+/* Options Container (Glassy + Neon Edge) */
+.options-container {
+    background: rgba(255, 255, 255, 0.1); /* Frosted glass effect */
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
+    width: 80%;
+    max-width: 600px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+/* Neon Edge Effect */
+.options-container::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #ff00ff, #ff4500, #ffd700);
+    z-index: -1;
+    filter: blur(15px);
+    opacity: 0.6;
+}
+
+/* Hover Animation */
+.options-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(255, 0, 255, 0.5);
+}
+
+/* Option Button Styling */
+.option {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    text-align: center;
+}
+
+/* Hover Effect for Options */
+.option:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+/* Correct and Wrong Option Highlight */
+.option.correct {
+    background-color: #28a745;
+    border-color: #28a745;
+    box-shadow: 0 0 20px rgba(40, 167, 69, 0.7);
+}
+
+.option.wrong {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.7);
+}
+/* New Background with Multi-Layer Gradient */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background: radial-gradient(circle at top left, #1c0032, #4b0082, #8a2be2);
+    background-size: 300% 300%;
+    animation: backgroundShift 10s ease infinite;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Background Animation */
+@keyframes backgroundShift {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Starry/Noise Effect Overlay */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.15; /* Subtle pattern overlay */
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Glow Animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle, rgba(255, 0, 255, 0.2), rgba(0, 0, 0, 0));
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+    z-index: -1;
+    animation: glowEffect 5s ease-in-out infinite alternate;
+}
+
+@keyframes glowEffect {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.4;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.6;
+    }
+}
+/* Multi-layer Dynamic Gradient Background */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background: linear-gradient(135deg, #1c0032, #4b0082, #8a2be2, #ff00ff);
+    background-size: 400% 400%;
+    animation: backgroundWave 10s ease infinite;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Animated Background Wave */
+@keyframes backgroundWave {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Light Wave Effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 0, 255, 0.15), rgba(0, 0, 0, 0));
+    transform: rotate(0deg);
+    animation: rotateWave 10s linear infinite;
+    z-index: -2;
+}
+
+@keyframes rotateWave {
+    0% {
+        transform: rotate(0deg);
+        opacity: 0.4;
+    }
+    100% {
+        transform: rotate(360deg);
+        opacity: 0.6;
+    }
+}
+
+/* Particle Effect */
+.particle {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particleMove 5s infinite;
+    z-index: -1;
+}
+
+@keyframes particleMove {
+    0% {
+        transform: translateY(0px) translateX(0px);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(50vw);
+        opacity: 0;
+    }
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 105, 180, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+}
+
+/* Title Styling */
+.main-title {
+    font-size: 48px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Subtitle Styling */
+.sub-title {
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 40px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Parallax Mouse Movement Effect */
+body {
+    perspective: 1000px;
+}
+
+
+
+  </style>
+</head>
+<body>
+
+<!-- ✅ Main Page -->
+<div class="main-container" id="mainContainer">
+  <h1 class="main-title">Seconds to Survive</h1>
+  <h2 class="sub-title">By AEP and ELAS</h2>
+  <button class="proceed-btn" onclick="showCategorySelection()">Proceed</button>
+</div>
+
+<!-- ✅ Category Selection -->
+<div class="container selection-container" id="selectionContainer">
+    <h1 class="container-title">Select Category</h1>
+    <div class="category-grid">
+      <div class="category-card" data-category="Logos" onclick="selectCategory('Logos')">
+        <div class="category-header">Logos</div>
+      </div>
+      <div class="category-card" data-category="Architecture" onclick="selectCategory('Architecture')">
+        <div class="category-header">Architecture</div>
+      </div>
+      <div class="category-card" data-category="Flags" onclick="selectCategory('Flags')">
+        <div class="category-header">Flags</div>
+      </div>
+      <div class="category-card" data-category="Icons" onclick="selectCategory('Icons')">
+        <div class="category-header">Icons</div>
+      </div>
+      <div class="category-card" data-category="Sports" onclick="selectCategory('Sports')">
+        <div class="category-header">Sports</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Subcategory Selection -->
+  <div class="subcategory-container" id="subcategoryContainer" style="display: none;">
+    <h1 class="title" id="subcategoryTitle">Selected Category</h1>
+    <div class="options-container" id="optionsContainer">
+      <div id="subcategoryOptions"></div>
+    </div>
+    <button class="proceed-btn" onclick="goBackToCategory()">Back</button>
+  </div>
+  
+  <script>
+    let selectedCategory = null;
+  
+    function selectCategory(category) {
+      selectedCategory = category;
+      document.getElementById('subcategoryTitle').textContent = category;
+      document.getElementById('selectionContainer').style.display = 'none';
+      document.getElementById('subcategoryContainer').style.display = 'block';
+  
+      const options = document.getElementById('subcategoryOptions');
+      options.innerHTML = '';
+  
+      let numberOfOptions = 0;
+      if (selectedCategory === 'Architecture' || selectedCategory === 'Logos') {
+        numberOfOptions = 4;
+      } else if (
+        selectedCategory === 'Flags' ||
+        selectedCategory === 'Icons' ||
+        selectedCategory === 'Sports'
+      ) {
+        numberOfOptions = 6;
+      }
+  
+      for (let i = 1; i <= numberOfOptions; i++) {
+        const option = document.createElement('div');
+        option.classList.add('subcategory-card');
+        option.textContent = `${category} - Option ${i}`;
+  
+        option.onclick = function () {
+          if (selectedCategory === 'Logos') {
+            window.location.href = `registration${i - 1}.html`;
+          } else if (selectedCategory === 'Architecture') {
+            window.location.href = `architecture${i}.html`;
+          } else if (selectedCategory === 'Flags') {
+            window.location.href = `flags${i}.html`;
+          } else if (selectedCategory === 'Icons') {
+            window.location.href = `icons${i}.html`;
+          } else if (selectedCategory === 'Sports') {
+            window.location.href = `sports${i}.html`;
+          }
+        };
+  
+        options.appendChild(option);
+      }
+  
+      optionsContainer.classList.add('show');
+    }
+  
+    function goBackToCategory() {
+      document.getElementById('subcategoryContainer').style.display = 'none';
+      document.getElementById('selectionContainer').style.display = 'block';
+    }
+    function goBackToCategory() {
+      document.getElementById('subcategoryContainer').style.display = 'none';
+      document.getElementById('selectionContainer').style.display = 'block';
+      document.getElementById('subcategoryOptions').innerHTML = '';
+    }
+
+  function goToRegistration() {
+    const mainContainer = document.getElementById('mainContainer');
+    mainContainer.classList.add('fade-out');
+
+    setTimeout(() => {
+        window.location.href = 'registration.html';
+    }, 500); // Match fadeOutScale duration
+}
+function goBackToCategory() {
+    document.getElementById('subcategoryContainer').classList.add('fade-out');
+    optionsContainer.classList.remove('show');
+    setTimeout(() => {
+        document.getElementById('subcategoryContainer').style.display = 'none';
+        document.getElementById('selectionContainer').style.display = 'block';
+        document.getElementById('subcategoryContainer').classList.remove('fade-out');
+    }, 500); // Match fadeOut duration
+}
+function createParticles() {
+        for (let i = 0; i < 40; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.top = `${Math.random() * 100}vh`;
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.animationDuration = `${Math.random() * 5 + 3}s`;
+            document.body.appendChild(particle);
+
+            // Remove after animation to avoid memory leaks
+            particle.addEventListener('animationend', () => {
+                particle.remove();
+            });
+        }
+    }
+
+    // Create particles every 2 seconds
+    setInterval(createParticles, 2000);
+    function showCategorySelection() {
+  document.getElementById('mainContainer').style.display = 'none';
+  document.getElementById('selectionContainer').style.display = 'block';
+}
+
+  
+    
+  
+</script>
+
+</body>
+</html>

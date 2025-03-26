@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c0032;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: url('23982.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .container {
+            background-color: #4b0082;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 350px;
+        }
+
+        h2 {
+            color: #ffd700;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .game-btn {
+            background-color: #6a0dad;
+            color: white;
+            padding: 12px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .game-btn:hover {
+            background-color: #8a2be2;
+        }
+                .container input {
+  width: 90%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 2px solid #6a0dad;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #32004b;
+  color: #ddd;
+  transition: border-color 0.3s;
+}
+
+.container input:focus {
+  border-color: #ffd700;
+}
+@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+
+        /* ✅ Apply Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+/* Flex container for buttons */
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Space between buttons */
+    margin-top: 30px;
+}
+
+/* Common Button Styling */
+.button-container button {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 12px 30px; /* Ensure equal padding */
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    height: 50px; /* Consistent height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Back Button */
+.back-btn {
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+.back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Start Game Button */
+.game-btn {
+    background-color: #8a2be2;
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.6);
+}
+
+.game-btn:hover {
+    background-color: #6a1bbd;
+    transform: scale(1.05);
+}
+/* Floating Glow Effect on Input Focus */
+.container input:focus {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px #ffd700;
+}
+
+/* Flashing Start Button */
+.game-btn {
+    font-family: 'Press Start 2P', cursive;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 15px #ff4500; }
+    50% { box-shadow: 0 0 30px #ff6347; }
+    100% { box-shadow: 0 0 15px #ff4500; }
+}
+
+/* Floating Particles for Background */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('particles.png') repeat;
+    animation: particleMove 30s linear infinite;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+@keyframes particleMove {
+    from { background-position: 0 0; }
+    to { background-position: 100% 100%; }
+}
+/* Registration Container with Frosted Glass + Neon Glow */
+.container {
+    background: rgba(255, 255, 255, 0.1); /* Frosted glass effect */
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: pulse 2s infinite ease-in-out;
+    z-index: 1;
+}
+
+/* Neon Glow Effect */
+.container::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(45deg, #ff00ff, #ff4500, #ffd700, #8a2be2);
+    background-size: 300% 300%;
+    z-index: -1;
+    filter: blur(15px);
+    opacity: 0.7;
+    border-radius: 24px;
+    animation: neonGlow 6s ease infinite;
+}
+
+/* Hover Effect */
+.container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 50px rgba(255, 0, 255, 0.6);
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 105, 180, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+}
+
+/* Animated Gradient for Neon Glow */
+@keyframes neonGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Input Styling with Subtle Glow */
+input {
+    width: 90%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Input Focus Glow */
+input:focus {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    outline: none;
+}
+
+/* Title Styling */
+h2 {
+    color: #ffd700;
+    font-size: 28px;
+    margin-bottom: 20px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Button Styling (Keep Same) */
+.game-btn {
+    background-color: #6a0dad;
+    color: white;
+    padding: 12px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.6);
+}
+
+.game-btn:hover {
+    background-color: #8a2be2;
+    transform: scale(1.05);
+}
+
+/* Back Button */
+.back-btn {
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    font-size: 18px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+/* Multi-layer Dynamic Gradient Background */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background: linear-gradient(135deg, #1c0032, #4b0082, #8a2be2, #ff00ff);
+    background-size: 400% 400%;
+    animation: backgroundWave 10s ease infinite;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Animated Background Wave */
+@keyframes backgroundWave {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Starry/Noise Effect Overlay */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.15; /* Subtle pattern overlay */
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Glow Animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle, rgba(255, 0, 255, 0.2), rgba(0, 0, 0, 0));
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+    z-index: -1;
+    animation: glowEffect 5s ease-in-out infinite alternate;
+}
+
+@keyframes glowEffect {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.4;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.6;
+    }
+}
+
+
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Enter Your Names</h2>
+        <input type="text" id="player1" placeholder="Player 1 Name" required>
+        <input type="text" id="player2" placeholder="Player 2 Name" required>
+        <div class="button-container">
+        <button class="back-btn" onclick="goBack()">⬅️ Back</button>
+        <button class="game-btn" onclick="startGame()">Start Game</button>
+    </div>
+    </div>
+
+    <script>
+ function startGame() {
+            var player1 = document.getElementById("player1").value.trim();
+            var player2 = document.getElementById("player2").value.trim();
+
+            if (player1 === "" || player2 === "") {
+                alert("Please enter both player names!");
+                return;
+            }
+
+            // ✅ Store names in localStorage
+            localStorage.setItem("player1", player1);
+            localStorage.setItem("player2", player2);
+
+            // ✅ Add fade-out animation after entering valid names
+            const container = document.querySelector('.container');
+            container.classList.add('fade-out');
+
+            // ✅ Redirect after animation finishes
+            setTimeout(() => {
+                window.location.href = 'game.html';
+            }, 500); // Match the fade-out duration
+        }
+
+        // ✅ Trigger fade-in when the page loads
+        window.onload = () => {
+            document.querySelector('.container').classList.add('fade-in');
+        };
+        function goBack() {
+    const container = document.querySelector('.container');
+    
+    // Add fade-out effect
+    container.classList.add('fade-out');
+
+    // Redirect after animation ends
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 500); // Match the transition duration
+}
+function startGame() {
+    var player1 = document.getElementById("player1").value.trim();
+    var player2 = document.getElementById("player2").value.trim();
+
+    if (player1 === "" || player2 === "") {
+        alert("Please enter both player names!");
+        return;
+    }
+
+    localStorage.setItem("player1", player1);
+    localStorage.setItem("player2", player2);
+
+    // Fade-out animation and redirect
+    const container = document.querySelector('.container');
+    container.classList.add('fade-out');
+  
+
+    setTimeout(() => {
+        window.location.href = 'game7.html';
+    }, 500);
+}
+
+
+    </script>
+
+</body>
+</html>

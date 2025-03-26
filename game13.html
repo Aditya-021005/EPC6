@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seconds to Survive - Game</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c0032;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: url('23983.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+/* Glowing Timer Ring */
+.timer.active {
+    box-shadow: 0 0 20px #ffd700, 0 0 40px #ff8c00;
+    border: 3px solid #ffd700;
+}
+
+/* Timer Blink Warning */
+.timer.warning {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { background-color: #ff4d4d; }
+    50% { background-color: #ff1a1a; }
+    100% { background-color: #ff4d4d; }
+}
+
+/* Update Button Font */
+.game-btn, .back-btn, .winner-btn {
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Flashing effect on winner display */
+.winner-container {
+    animation: neonGlow 2s infinite;
+}
+
+        /* Game Container */
+        .game-container {
+    background-color: rgba(255, 255, 255, 0.1); /* Very light white tint */
+    backdrop-filter: blur(10px); /* Subtle blur for a frosted glass effect */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    text-align: center;
+    max-width: 800px;
+    width: 90%;
+}
+
+
+
+
+        h1 {
+            font-size: 36px;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        /* Timers */
+        .timer {
+            font-size: 22px;
+            font-weight: bold;
+            background-color: #5a007a;
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Question Image */
+        .question-img {
+            width: 680px;
+            height: 400px;
+            border: 3px solid #ffd700;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+
+        /* Buttons */
+        .game-btn {
+            background-color: #e87218;
+            color: #ffffff;
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px;
+            box-shadow: 0 0 15px rgba(106, 13, 173, 0.6);
+        }
+
+        .game-btn:hover {
+            background-color: #8a2be2;
+            transform: translateY(-3px);
+        }
+
+        /* Pause Button */
+        #pause-btn {
+            background-color: #d13fd1;
+        }
+
+        #pause-btn:hover {
+            background-color: #7f0877;
+            
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease;
+}
+
+/* Spinner Animation */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #ffffff;
+    border-top-color: #e87218;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Spin Keyframe */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Fade-in Effect for Overlay */
+.show-loading {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Timer Styling */
+.timer {
+    font-size: 28px; /* Increased font size */
+    font-weight: bold;
+    background-color: #ffd700; /* Gold background */
+    color: #1c0032; /* Deep purple for contrast */
+    padding: 10px 20px;
+    border-radius: 12px;
+    display: inline-block;
+    margin: 5px 10px;
+    border: 2px solid #ffcc00; /* Gold border */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7); /* Gold glow */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* When timer is under 30 seconds */
+.timer.warning {
+    background-color: #ff4d4d; /* Red background */
+    color: #ffffff; /* White text */
+    border-color: #ff0000;
+    animation: pulse 1s infinite;
+}
+
+/* Pulse Animation for Timer */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 25px rgba(255, 0, 0, 1);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+    }
+}
+/* Flex container for buttons */
+.button-container {
+    display: flex;
+    justify-content: center; /* Center buttons horizontally */
+    align-items: center;
+    gap: 20px; /* Add space between buttons */
+    margin-top: 20px;
+}
+
+/* Back Button */
+.back-btn {
+    background-color: transparent;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 10px 20px;
+    border: 2px solid #ffffff;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Pause Button */
+#pause-btn {
+    background-color: #db1cae;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#pause-btn:hover {
+    background-color: #6a1bbd;
+    transform: scale(1.05);
+}
+
+/* Fade-out Animation */
+.fade-out {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+/* Winner Container */
+.winner-container {
+    background-color: rgba(255, 255, 255, 0.1); /* Light white tint */
+    backdrop-filter: blur(10px); /* Frosted glass effect */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    color: #ffffff;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Show Winner Container */
+.show-winner {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Restart Button */
+.winner-btn {
+    background-color: #e87218;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 20px;
+    box-shadow: 0 0 15px rgba(106, 13, 173, 0.6);
+}
+
+.winner-btn:hover {
+    background-color: #8a2be2;
+    transform: translateY(-3px);
+}
+/* Game Container with Frosted Glass Effect + Neon Glow */
+.game-container {
+    background: rgba(255, 255, 255, 0.08); /* Frosted glass effect */
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    width: 90%;
+    max-width: 800px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: pulse 2s infinite ease-in-out;
+    z-index: 1;
+}
+
+/* Neon Glow Effect */
+.game-container::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(45deg, #ff00ff, #ff4500, #ffd700, #8a2be2);
+    background-size: 300% 300%;
+    z-index: -1;
+    filter: blur(15px);
+    opacity: 0.7;
+    border-radius: 24px;
+    animation: neonGlow 6s ease infinite;
+}
+
+/* Hover Effect */
+.game-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 50px rgba(255, 0, 255, 0.6);
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 105, 180, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+}
+
+/* Animated Gradient for Neon Glow */
+@keyframes neonGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Timer Styling with Glow */
+.timer {
+    font-size: 28px;
+    font-weight: bold;
+    background-color: #ffd700;
+    color: #1c0032;
+    padding: 10px 20px;
+    border-radius: 12px;
+    display: inline-block;
+    margin: 5px 10px;
+    border: 2px solid #ffcc00;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Timer Warning Glow */
+.timer.warning {
+    background-color: #ff4d4d;
+    color: #ffffff;
+    border-color: #ff0000;
+    animation: pulseRed 1s infinite;
+}
+
+@keyframes pulseRed {
+    0% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 0, 0, 1);
+        transform: scale(1.05);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        transform: scale(1);
+    }
+}
+
+/* Parallax Mouse Movement Effect */
+body {
+    perspective: 1000px;
+}
+
+.game-container {
+    transform: translateZ(0);
+    transition: transform 0.3s ease;
+}
+
+body:hover .game-container {
+    transform: translateZ(50px);
+}
+
+/* Image Styling with Glow */
+.question-img {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 12px;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    transition: box-shadow 0.3s ease;
+}
+
+.question-img:hover {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 1);
+}
+
+/* Buttons Stay the Same */
+/* High-Intensity Game Background */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background: radial-gradient(circle at top right, #1c0032, #4b0082, #ff00ff, #ff4500);
+    background-size: 300% 300%;
+    animation: gameWave 8s ease infinite;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Fast-Moving Background Animation */
+@keyframes gameWave {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Light Wave Effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 0, 255, 0.1), rgba(0, 0, 0, 0));
+    transform: rotate(0deg);
+    animation: rotateWave 6s linear infinite;
+    z-index: -2;
+}
+
+@keyframes rotateWave {
+    0% {
+        transform: rotate(0deg);
+        opacity: 0.4;
+    }
+    100% {
+        transform: rotate(360deg);
+        opacity: 0.6;
+    }
+}
+
+/* Floating Orbs */
+.orb {
+    position: fixed;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, #ff00ff, rgba(255, 0, 255, 0));
+    border-radius: 50%;
+    opacity: 0.4;
+    z-index: -1;
+    animation: floatOrb 5s ease-in-out infinite alternate;
+}
+
+@keyframes floatOrb {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(30px, -30px) scale(1.2);
+        opacity: 1;
+    }
+}
+/* High-Contrast Game Background */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background: linear-gradient(135deg, #1c0032, #200040, #400080, #ff0080);
+    background-size: 300% 300%;
+    animation: backgroundWave 8s ease infinite;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Background Animation */
+@keyframes backgroundWave {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Game Container with Frosted Glass and Sharp Neon Glow */
+.game-container {
+    background: rgba(10, 10, 30, 0.9); /* DARKER container for contrast */
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(255, 0, 255, 0.6); /* Sharper glow */
+    border: 2px solid rgba(255, 0, 255, 0.4);
+    position: relative;
+    width: 90%;
+    max-width: 800px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Glow Effect */
+.game-container::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(45deg, #ff00ff, #ff4500, #ff0080);
+    background-size: 400% 400%;
+    z-index: -1;
+    filter: blur(20px);
+    opacity: 0.8;
+    border-radius: 24px;
+    animation: neonFlow 4s ease infinite;
+}
+
+@keyframes neonFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Hover Effect */
+.game-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 60px rgba(255, 0, 255, 0.8);
+}
+
+/* Dynamic Light Streaks */
+.streak {
+    position: fixed;
+    width: 2px;
+    height: 100px;
+    background: linear-gradient(180deg, #ff00ff, #ff0080, transparent);
+    opacity: 0.7;
+    z-index: -2;
+    animation: streakMove 3s linear infinite;
+}
+
+@keyframes streakMove {
+    from {
+        transform: translateY(-150vh) translateX(-30vw);
+    }
+    to {
+        transform: translateY(150vh) translateX(30vw);
+    }
+}
+/* High-Contrast Game Background */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background: linear-gradient(135deg, #1c0032, #200040, #400080, #ff0080);
+    background-size: 300% 300%;
+    animation: backgroundWave 8s ease infinite;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+    transition: opacity 0.5s ease;
+}
+
+/* Background Animation */
+@keyframes backgroundWave {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Game Container with Frosted Glass and Neon Glow */
+.game-container {
+    background: rgba(10, 10, 30, 0.9);
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(255, 0, 255, 0.6);
+    border: 2px solid rgba(255, 0, 255, 0.4);
+    position: relative;
+    width: 90%;
+    max-width: 600px; /* ✅ Reduced width */
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* Glow Effect */
+.game-container::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(45deg, #ff00ff, #ff4500, #ff0080);
+    background-size: 400% 400%;
+    z-index: -1;
+    filter: blur(20px);
+    opacity: 0.8;
+    border-radius: 24px;
+    animation: neonFlow 4s ease infinite;
+}
+
+@keyframes neonFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ✅ Reduced Scaling on Hover */
+.game-container:hover {
+    transform: scale(1.02); /* ✅ Reduced from 1.05 to 1.02 */
+    box-shadow: 0 20px 60px rgba(255, 0, 255, 0.8);
+}
+
+/* Back Button Styling */
+.back-btn {
+    background-color: transparent;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 10px 20px;
+    border: 2px solid #ffffff;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Light Streak Effect (Optional) */
+.streak {
+    position: fixed;
+    width: 2px;
+    height: 100px;
+    background: linear-gradient(180deg, #ff00ff, #ff0080, transparent);
+    opacity: 0.7;
+    z-index: -2;
+    animation: streakMove 3s linear infinite;
+}
+
+@keyframes streakMove {
+    from {
+        transform: translateY(-150vh) translateX(-30vw);
+    }
+    to {
+        transform: translateY(150vh) translateX(30vw);
+    }
+}
+
+/* ✅ Fade-Out Animation */
+.fade-out {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+@media (max-width: 768px) {
+    .game-container {
+        padding: 30px;
+        max-width: 500px;
+    }
+    
+    .back-btn {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
+}
+
+/* Small Screens (Phones) */
+@media (max-width: 480px) {
+    .game-container {
+        padding: 20px;
+        max-width: 90%;
+        border-radius: 16px;
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+    }
+
+    .back-btn {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    h1, h2 {
+        font-size: 18px;
+    }
+}
+
+
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+.loader {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 0, 0.2);
+    box-shadow: 0 0 20px #ffdd00;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background-color: #ffd700;
+    transition: width 0.1s ease;
+}
+
+#progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffd700;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Hide Loading Screen */
+.hide-loading {
+    opacity: 0;
+    pointer-events: none;
+}
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #1c0032;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.loader {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background-color: rgba(255, 0, 255, 0.1);
+    box-shadow: 0 0 40px rgba(255, 0, 255, 0.8), 0 0 60px rgba(138, 43, 226, 0.8);
+    position: relative;
+    overflow: hidden;
+    border: 4px solid rgba(255, 0, 255, 0.6);
+    animation: glow 2s infinite alternate;
+}
+
+.progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(45deg, #ff00ff, #ff4500, #ffd700);
+    transition: width 0.2s ease;
+}
+
+#progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffd700;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
+    text-shadow: 0 0 20px #ff4500, 0 0 30px #ffd700;
+}
+
+/* Glow Animation */
+@keyframes glow {
+    from {
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+    to {
+        box-shadow: 0 0 40px rgba(255, 0, 255, 0.9);
+    }
+}
+
+/* Fade-out effect */
+.hide-loading {
+    opacity: 0;
+    pointer-events: none;
+}
+
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loading-screen">
+        <div class="loader">
+            <div class="progress">
+                <span id="progress-text">0%</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class="game-container">
+        <div>
+            <span class="timer" id="timer1">${player1}: 2:00</span>
+            <span class="timer" id="timer2">${player2}: 2:00</span>
+        </div>
+        <img id="question-img" class="question-img" src="icon_img2_1.png" alt="Question">
+        <div>
+        </div>
+        <div class="button-container">
+            <button class="back-btn" onclick="goBack()">⬅️ Back</button>
+            <button id="pause-btn" class="game-btn" onclick="togglePause()">⏸️ Pause</button>
+        </div>
+        
+
+    </div>
+    
+
+    <audio id="wrong-sound" src="wrong.mp3"></audio>
+    <audio id="correct-sound" src="correct.mp3"></audio>
+    <audio id="tick-tock-sound" src="tick-tock-31883.mp3" loop></audio>
+
+
+
+    <script>
+         let player1 = localStorage.getItem("player1") || "User 1";
+         let player2 = localStorage.getItem("player2") || "User 2";
+         let questions = [
+  "icon_img2_1.png", "icon_img2_2.png", "icon_img2_3.png", "icon_img2_4.png", "icon_img2_5.png",
+  "icon_img2_6.png", "icon_img2_7.png", "icon_img2_8.png", "icon_img2_9.png", "icon_img2_10.png",
+  "icon_img2_11.png", "icon_img2_12.png", "icon_img2_13.png", "icon_img2_14.png", "icon_img2_15.png",
+  "icon_img2_16.png", "icon_img2_17.png", "icon_img2_18.png", "icon_img2_19.png", "icon_img2_20.png",
+  "icon_img2_21.png", "icon_img2_22.png", "icon_img2_23.png", "icon_img2_24.png", "icon_img2_25.png",
+  "icon_img2_26.png", "icon_img2_27.png", "icon_img2_28.png", "icon_img2_29.png"
+];
+
+
+let answers = {
+  "icon_img2_1.png": "George Washington",
+  "icon_img2_2.png": "John Adams",
+  "icon_img2_3.png": "Thomas Jefferson",
+  "icon_img2_4.png": "James Madison",
+  "icon_img2_5.png": "James Monroe",
+  "icon_img2_6.png": "John Quincy Adams",
+  "icon_img2_7.png": "Andrew Jackson",
+  "icon_img2_8.png": "Martin Van Buren",
+  "icon_img2_9.png": "William Henry Harrison",
+  "icon_img2_10.png": "John Tyler",
+  "icon_img2_11.png": "James Polk",
+  "icon_img2_12.png": "Zachary Taylor",
+  "icon_img2_13.png": "Millard Fillmore",
+  "icon_img2_14.png": "Franklin Pierce",
+  "icon_img2_15.png": "James Buchanan",
+  "icon_img2_16.png": "Abraham Lincoln",
+  "icon_img2_17.png": "Andrew Johnson",
+  "icon_img2_18.png": "Ulysses Grant",
+  "icon_img2_19.png": "Rutherford B. Hayes",
+  "icon_img2_20.png": "James Garfield",
+  "icon_img2_21.png": "Chester A. Arthur",
+  "icon_img2_22.png": "Grover Cleveland",
+  "icon_img2_23.png": "Benjamin Harrison",
+  "icon_img2_24.png": "William McKinley",
+  "icon_img2_25.png": "Theodore Roosevelt",
+  "icon_img2_26.png": "William Howard Taft",
+  "icon_img2_27.png": "Woodrow Wilson",
+  "icon_img2_28.png": "Warren Harding",
+  "icon_img2_29.png": "Calvin Coolidge"
+};
+
+
+
+
+let currentIndex = 0;
+let currentUser = 1;
+let timers = { 1: 120, 2: 120 };
+let scores = { 1: 0, 2: 0 }; // Track scores
+let interval;
+let isPaused = false;
+let isAnswerShown = false;
+let tickTockSound = document.getElementById("tick-tock-sound");
+
+function startTimer() {
+    // ✅ Clear any existing interval before starting a new one
+    clearInterval(interval);
+
+    interval = setInterval(() => {
+        if (!isPaused && !isAnswerShown) {
+            timers[currentUser]--;
+
+            // ✅ Start tick-tock sound when timer reaches 30 seconds
+            if (timers[currentUser] === 30) {
+                tickTockSound.play().catch(err => console.log("Sound play blocked:", err));
+            }
+
+            // ✅ Stop tick-tock sound and end game when timer reaches 0
+            if (timers[currentUser] <= 0) {
+                tickTockSound.pause();
+                tickTockSound.currentTime = 0;
+                clearInterval(interval);
+                alert(`User ${currentUser} time over!`);
+                endGame();
+            }
+
+            updateUI();
+        }
+    }, 1000); // ✅ Fixed to reduce by 1 second
+}
+
+function updateUI() {
+    document.getElementById("timer1").textContent = `${player1}: ${formatTime(timers[1])} | Score: ${scores[1]}`;
+    document.getElementById("timer2").textContent = `${player2}: ${formatTime(timers[2])} | Score: ${scores[2]}`;
+}
+
+function formatTime(seconds) {
+    let min = Math.floor(seconds / 60);
+    let sec = seconds % 60;
+    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
+}
+
+function correctAnswer() {
+    document.getElementById("correct-sound").play();
+    scores[currentUser] += 10; // Increase score for correct answer
+    showAnswer(true);
+
+    // SWITCH USER because answer is correct
+    switchUser();
+}
+
+function wrongAnswer() {
+    document.getElementById("wrong-sound").play();
+
+    // ✅ Subtract 5 points for wrong answer
+    scores[currentUser] -= 5;
+
+    // ✅ Prevent negative scores
+    if (scores[currentUser] < 0) {
+        scores[currentUser] = 0;
+    }
+
+    timers[currentUser] -= 5; // Keep the existing time penalty
+
+    updateUI();
+    showAnswer(false);
+}
+
+
+function showAnswer(isCorrect) {
+    clearInterval(interval);
+    isAnswerShown = true;
+
+    // Stop tick-tock sound if it's playing
+    tickTockSound.pause();
+    tickTockSound.currentTime = 0;
+
+    let answerText = document.createElement("div");
+    answerText.id = "answer-text";
+    answerText.textContent = `Answer: ${answers[questions[currentIndex]]}`;
+    answerText.style.fontSize = "20px";
+    answerText.style.fontWeight = "bold";
+    answerText.style.marginTop = "10px";
+    answerText.style.padding = "10px";
+    answerText.style.borderRadius = "8px";
+    answerText.style.backgroundColor = isCorrect ? "#28a745" : "#dc3545";
+
+    document.querySelector(".game-container").appendChild(answerText);
+
+    setTimeout(() => {
+        answerText.remove();
+        nextQuestion(); 
+    }, 2000);
+}
+
+function endGame() {
+    clearInterval(interval);
+
+    // Stop tick-tock sound if playing
+    tickTockSound.pause();
+    tickTockSound.currentTime = 0;
+
+    document.querySelector(".game-container").style.display = "none";
+    // ... rest of the endGame code
+}
+
+
+
+
+function nextQuestion() {
+    currentIndex++;
+
+    if (currentIndex >= questions.length) {
+        endGame();
+        return;
+    }
+
+    document.getElementById("question-img").src = questions[currentIndex];
+
+    isAnswerShown = false;
+    startTimer();
+}
+
+function switchUser() {
+    currentUser = currentUser === 1 ? 2 : 1;
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+
+    if (isPaused) {
+        // Pause tick-tock sound
+        tickTockSound.pause();
+        document.getElementById("pause-btn").textContent = "▶️ Resume";
+    } else {
+        // Resume tick-tock sound only if time is <= 30 seconds
+        if (timers[currentUser] <= 30) {
+            tickTockSound.play().catch(error => console.log("Audio play prevented:", error));
+        }
+        document.getElementById("pause-btn").textContent = "⏸️ Pause";
+    }
+}
+
+function endGame() {
+    clearInterval(interval);
+    
+    // Hide the game container
+    document.querySelector(".game-container").style.display = "none";
+
+    // Create winner container
+    let winnerContainer = document.createElement("div");
+    winnerContainer.classList.add("winner-container");
+
+    // Title
+    let winnerTitle = document.createElement("h1");
+    winnerTitle.textContent = "Game Over!";
+    winnerTitle.style.color = "#ffd700";
+
+    // Message
+    let winnerMessage = document.createElement("h2");
+    if (scores[1] > scores[2]) {
+        winnerMessage.textContent = `🏆 Winner: ${player1}!`;
+    } else if (scores[2] > scores[1]) {
+        winnerMessage.textContent = `🏆 Winner: ${player2}!`;
+    } else {
+        winnerMessage.textContent = "🤝 It's a Tie!";
+    }
+
+    // Final Scores
+    let finalScores = document.createElement("p");
+    finalScores.textContent = `Final Scores: ${player1}: ${scores[1]} | ${player2}: ${scores[2]}`;
+    finalScores.style.fontSize = "20px";
+    finalScores.style.margin = "15px 0";
+
+    // Restart Button
+    let restartButton = document.createElement("button");
+    restartButton.textContent = "🔄 Play Again";
+    restartButton.classList.add("winner-btn");
+    restartButton.onclick = () => {
+        window.location.href = "index.html";
+    };
+
+    // Append elements to container
+    winnerContainer.appendChild(winnerTitle);
+    winnerContainer.appendChild(winnerMessage);
+    winnerContainer.appendChild(finalScores);
+    winnerContainer.appendChild(restartButton);
+
+    // Add container to body
+    document.body.appendChild(winnerContainer);
+
+    // Fade-in animation for the winner screen
+    setTimeout(() => {
+        winnerContainer.classList.add('show-winner');
+    }, 100);
+}
+
+// Event listeners for keyboard controls
+document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+        wrongAnswer();
+    } else if (event.key === "ArrowRight") {
+        correctAnswer();
+    } else if (event.key === " ") {
+        togglePause();
+    }
+});
+
+
+startTimer();
+window.onload = () => {
+    document.querySelector('.game-container').classList.add('fade-in');
+};
+function redirectToGame() {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    
+    // Show loading spinner
+    loadingOverlay.classList.add('show-loading');
+
+    // Wait for 2 seconds before redirecting
+    setTimeout(() => {
+        window.location.href = "index.html"; // Redirect after animation
+    }, 2000);
+}
+function goBack() {
+    const container = document.querySelector('.game-container');
+    
+    // Add fade-out effect
+    container.classList.add('fade-out');
+
+    // Redirect after animation ends
+    setTimeout(() => {
+        window.location.href = 'icons2.html';
+    }, 500); // Match the transition duration
+}
+function updateUI() {
+    const timer1 = document.getElementById("timer1");
+    const timer2 = document.getElementById("timer2");
+
+    timer1.textContent = `${player1}: ${formatTime(timers[1])} | Score: ${scores[1]}`;
+    timer2.textContent = `${player2}: ${formatTime(timers[2])} | Score: ${scores[2]}`;
+
+    // Highlight active timer
+    if (currentUser === 1) {
+        timer1.classList.add('active');
+        timer2.classList.remove('active');
+    } else {
+        timer2.classList.add('active');
+        timer1.classList.remove('active');
+    }
+
+    // Add warning effect when timer is low
+    if (timers[currentUser] <= 30) {
+        document.getElementById(`timer${currentUser}`).classList.add('warning');
+    } else {
+        document.getElementById(`timer${currentUser}`).classList.remove('warning');
+    }
+}
+function createStreaks() {
+        for (let i = 0; i < 10; i++) {
+            const streak = document.createElement('div');
+            streak.classList.add('streak');
+            streak.style.left = `${Math.random() * 100}vw`;
+            streak.style.animationDuration = `${Math.random() * 2 + 3}s`;
+            streak.style.animationDelay = `${Math.random() * 1.5}s`;
+            document.body.appendChild(streak);
+
+            // Remove streaks after animation to prevent memory leaks
+            streak.addEventListener('animationend', () => {
+                streak.remove();
+            });
+        }
+    }
+
+    // Create streaks every 1.5 seconds
+    setInterval(createStreaks, 1500);
+    function startLoadingScreen() {
+    const loadingScreen = document.getElementById("loading-screen");
+    const progressBar = document.querySelector(".progress");
+    const progressText = document.getElementById("progress-text");
+    let progress = 0;
+
+    // ✅ Clear any previous loading progress
+    progressBar.style.width = "0%";
+    progressText.textContent = "0%";
+
+    const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress > 100) progress = 100;
+
+        progressBar.style.width = `${progress}%`;
+        progressText.textContent = `${Math.round(progress)}%`;
+
+        if (progress === 100) {
+            clearInterval(interval);
+
+            setTimeout(() => {
+                loadingScreen.classList.add('hide-loading');
+
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+
+                    // ✅ Ensure timer starts only once after loading
+                    if (!interval) {
+                        startTimer();
+                    }
+                }, 500);
+            }, 500);
+        }
+    }, 100);
+}
+// Start the loading screen when the game loads
+window.onload = () => {
+    startLoadingScreen();
+    startTimer(); // Start your game timer after loading finishes
+};
+
+    </script>
