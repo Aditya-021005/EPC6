@@ -755,6 +755,18 @@ body {
       <div class="category-card" data-category="Sports" onclick="selectCategory('Sports')">
         <div class="category-header">Sports</div>
       </div>
+      <div class="category-card" data-category="Sports" onclick="selectCategory('Books')">
+        <div class="category-header">Books</div>
+      </div>
+      <div class="category-card" data-category="Sports" onclick="selectCategory('Culture')">
+        <div class="category-header">Culture</div>
+      </div>
+      <div class="category-card" data-category="Sports" onclick="selectCategory('Countries')">
+        <div class="category-header">Countries</div>
+      </div>
+      <div class="category-card" data-category="Sports" onclick="selectCategory('Anatomy')">
+        <div class="category-header">Anatomy</div>
+      </div>
     </div>
   </div>
   
@@ -789,6 +801,25 @@ body {
       ) {
         numberOfOptions = 6;
       }
+      else if (
+        selectedCategory === 'Books') {
+            numberOfOptions = 5;
+        
+        }
+        else if (
+        selectedCategory === 'Culture') {
+            numberOfOptions = 6;
+        
+        }
+        else if (
+        selectedCategory === 'Countries') {
+            numberOfOptions = 3;
+        }
+        else if (
+        selectedCategory === 'Anatomy') {
+            numberOfOptions = 2;
+        }
+      
   
       for (let i = 1; i <= numberOfOptions; i++) {
         const option = document.createElement('div');
@@ -806,6 +837,17 @@ body {
             window.location.href = `icons${i}.html`;
           } else if (selectedCategory === 'Sports') {
             window.location.href = `sports${i}.html`;
+          } else if (selectedCategory === 'Books') {
+            window.location.href = `books${i}.html`;
+          }
+         else if (selectedCategory === 'Culture') {
+            window.location.href = `culture${i}.html`;
+          }
+         else if (selectedCategory === 'Anatomy') {
+            window.location.href = `anatomy${i}.html`;
+          }
+         else if (selectedCategory === 'Countries') {
+            window.location.href = `countries${i}.html`;
           }
         };
   
