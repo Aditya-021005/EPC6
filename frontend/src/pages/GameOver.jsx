@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import './GameOver.css';
 
 export default function GameOver() {
   const navigate = useNavigate();

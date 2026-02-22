@@ -1,0 +1,35 @@
+/* --- Neural Link Calibration (Registration) --- */
+
+.calibration-info {
+  margin-bottom: 30px;
+}
+
+.calibration-step {
+  font-size: 10px;
+  color: var(--cyan);
+  font-family: var(--font-display);
+  letter-spacing: 3px;
+  display: block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.neural-input-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-scanner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  transition: width 0.3s ease;
+}
+
+.form-input:focus+.input-scanner {
+  width: 100%;
+}

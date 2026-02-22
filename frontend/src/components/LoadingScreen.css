@@ -1,0 +1,253 @@
+/* ===== LOADING SCREEN ===== */
+
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.6s ease;
+}
+
+.loading-screen.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(0, 240, 255, 0.2);
+  overflow: hidden;
+}
+
+.loader-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(0deg, var(--cyan), var(--magenta));
+  transition: height 0.2s ease;
+  opacity: 0.3;
+}
+
+.loader-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cyan);
+  z-index: 1;
+}
+
+.loader-label {
+  margin-top: 24px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* --- Tactical Loading Redesign --- */
+.tactical-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.neural-radar {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(0, 255, 255, 0.03);
+  border: 4px double rgba(0, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(0, 255, 255, 0.1), 0 0 15px rgba(0, 255, 255, 0.05);
+}
+
+.radar-sweep {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: conic-gradient(from 0deg, rgba(0, 255, 255, 0.4) 0deg, transparent 90deg);
+  transform-origin: top left;
+  animation: radar-spin 2s linear infinite;
+  z-index: 2;
+}
+
+@keyframes radar-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.radar-circles .circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(0, 255, 255, 0.05);
+}
+
+.radar-circles .circle:nth-child(1) {
+  width: 33%;
+  height: 33%;
+}
+
+.radar-circles .circle:nth-child(2) {
+  width: 66%;
+  height: 66%;
+}
+
+.radar-circles .circle:nth-child(3) {
+  width: 100%;
+  height: 100%;
+}
+
+.radar-dots .dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--cyan);
+  animation: dot-flicker 1.5s infinite alternate;
+}
+
+@keyframes dot-flicker {
+  from {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.loader-hud {
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-display);
+}
+
+.loader-header {
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.loader-status {
+  font-size: 14px;
+  color: var(--white);
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-blink {
+  width: 8px;
+  height: 8px;
+  background: var(--cyan);
+  border-radius: 1px;
+  animation: status-blink 0.5s infinite step-end;
+}
+
+@keyframes status-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.loader-progress-module {
+  width: 100%;
+}
+
+.loader-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.loader-progress-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loader-progress-fill {
+  height: 100%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  transition: width 0.3s ease;
+}
+
+.loading-screen.hide {
+  opacity: 0;
+  transform: scale(1.1);
+  filter: blur(20px);
+  transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Terminal Log in Loader */
+.loader-terminal-log {
+  height: 80px;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  color: rgba(0, 255, 255, 0.4);
+  line-height: 1.4;
+  margin-bottom: 20px;
+  border-left: 1px solid rgba(0, 255, 255, 0.2);
+  padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.log-entry {
+  animation: log-fade-in 0.3s forwards;
+}
+
+@keyframes log-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

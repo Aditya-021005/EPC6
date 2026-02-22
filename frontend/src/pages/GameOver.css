@@ -1,0 +1,63 @@
+/* ===== WINNER CONTAINER ===== */
+
+.winner-container {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.winner-container h1 {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--gold), #fff, var(--gold));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titleShimmer 4s linear infinite;
+  margin-bottom: 12px;
+}
+
+.winner-container h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.winner-container .scores {
+  font-family: var(--font-body);
+  font-size: 16px;
+  margin: 24px 0;
+  color: var(--text-secondary);
+  line-height: 2.2;
+}
+
+.winner-container .scores strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.winner-btn {
+  background: linear-gradient(135deg, var(--gold), #ff8800);
+  color: var(--bg-dark);
+  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 16px 36px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  box-shadow: 0 4px 20px var(--gold-glow);
+}
+
+.winner-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 204, 0, 0.5);
+}

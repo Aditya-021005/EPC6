@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import './Registration.css';
 
 export default function Registration() {
   const { quizId } = useParams();
@@ -35,30 +36,45 @@ export default function Registration() {
           transition: 'opacity 0.5s ease, transform 0.5s ease',
         }}
       >
-        <h2 className="section-title">Player Setup</h2>
-        <input
-          className="form-input"
-          type="text"
-          placeholder="Player 1"
-          value={player1}
-          onChange={e => setPlayer1(e.target.value)}
-          onKeyDown={handleKeyDown}
-          autoFocus
-        />
-        <input
-          className="form-input"
-          type="text"
-          placeholder="Player 2"
-          value={player2}
-          onChange={e => setPlayer2(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <div className="button-row">
+        <div className="calibration-header">
+          <h2 className="section-title">NEURAL LINK <span>CALIBRATION</span></h2>
+          <div className="calibration-info">
+            <span className="calibration-step">PROTOCOL: SYNC_USER_ID</span>
+          </div>
+        </div>
+
+        <div className="neural-input-group">
+          <input
+            className="form-input"
+            type="text"
+            placeholder="PILOT 01 IDENTIFIER"
+            value={player1}
+            onChange={e => setPlayer1(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoFocus
+          />
+          <div className="input-scanner"></div>
+        </div>
+
+        <div className="neural-input-group">
+          <input
+            className="form-input"
+            type="text"
+            placeholder="PILOT 02 IDENTIFIER"
+            value={player2}
+            onChange={e => setPlayer2(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <div className="input-scanner"></div>
+        </div>
+
+        <div className="button-row" style={{ marginTop: 20 }}>
           <button className="btn-back" onClick={() => navigate(-1)}>
-            ← Back
+            ← ABORT
           </button>
-          <button className="btn-primary" onClick={handleStartGame}>
-            START GAME
+          <button className="btn-primary-glitch" onClick={handleStartGame}>
+            <span className="btn-text">INITIATE LINK</span>
+            <span className="btn-glitch-effect"></span>
           </button>
         </div>
       </div>

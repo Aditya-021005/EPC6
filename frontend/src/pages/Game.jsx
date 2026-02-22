@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import './GameArena.css';
 import LoadingScreen from '../components/LoadingScreen';
 
 export default function Game() {
@@ -12,6 +13,10 @@ export default function Game() {
 
   // Game state
   const [questions, setQuestions] = useState([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [gameOver, setGameOver] = useState(false);
+  const [quizMeta, setQuizMeta] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState(1);
   const [timers, setTimers] = useState({ 1: 120, 2: 120 });
@@ -19,11 +24,9 @@ export default function Game() {
   const [isPaused, setIsPaused] = useState(false);
   const [isAnswerShown, setIsAnswerShown] = useState(false);
   const [answerResult, setAnswerResult] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [dataLoaded, setDataLoaded] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-  const [quizMeta, setQuizMeta] = useState({ category: '', subcategory: '' });
+  const [combo, setCombo] = useState(0);
+  const [glitchActive, setGlitchActive] = useState(false);
 
   // Refs
   const intervalRef = useRef(null);
@@ -39,15 +42,16 @@ export default function Game() {
     scores: { 1: 0, 2: 0 },
     questions: [],
     currentIndex: 0,
+    combo: 0,
   });
 
   // Keep ref in sync
   useEffect(() => {
     stateRef.current = {
       currentUser, isPaused, isAnswerShown, gameOver,
-      timers, scores, questions, currentIndex,
+      timers, scores, questions, currentIndex, combo
     };
-  }, [currentUser, isPaused, isAnswerShown, gameOver, timers, scores, questions, currentIndex]);
+  }, [currentUser, isPaused, isAnswerShown, gameOver, timers, scores, questions, currentIndex, combo]);
 
   // Initialize audio once
   useEffect(() => {
@@ -56,26 +60,56 @@ export default function Game() {
     correctSoundRef.current = new Audio('/sounds/correct.mp3');
     wrongSoundRef.current = new Audio('/sounds/wrong.mp3');
 
+    // Occasional glitch disruption
+    const glitchInterval = setInterval(() => {
+      const s = stateRef.current;
+      if (!s.isPaused && !s.gameOver && !s.isAnswerShown && Math.random() > 0.7) {
+        setGlitchActive(true);
+        setTimeout(() => setGlitchActive(false), 800);
+      }
+    }, 5000);
+
     return () => {
       tickTockRef.current?.pause();
       clearInterval(intervalRef.current);
+      clearInterval(glitchInterval);
     };
   }, []);
 
   // Fetch questions
   useEffect(() => {
+    console.log(`[SYS] Initiating fetch for QuizID: ${quizId}`);
     fetch(`/api/quiz/${quizId}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        return res.json();
+      })
       .then(data => {
+        console.log(`[SYS] Data received for ${quizId}:`, data);
+        if (!data.questions || data.questions.length === 0) {
+          console.error(`[SYS] No questions found for QuizID: ${quizId}`);
+        }
         setQuestions(data.questions || []);
         setQuizMeta({ category: data.category, subcategory: data.subcategory });
         setDataLoaded(true);
       })
       .catch(err => {
-        console.error('Failed to load quiz:', err);
+        console.error('[SYS] Failed to load mission data:', err);
+        setQuizMeta({ error: true, message: err.message });
         setDataLoaded(true);
       });
   }, [quizId]);
+
+  // Handle initialization hang
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading && dataLoaded && questions.length === 0) {
+        console.warn("[SYS] Loading hang detected. Forcing transition.");
+        setLoading(false);
+      }
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [loading, dataLoaded, questions]);
 
   // Save scores to leaderboard when game ends
   const scoresSavedRef = useRef(false);
@@ -182,10 +216,22 @@ export default function Game() {
     const s = stateRef.current;
     if (s.isAnswerShown || s.gameOver) return;
     correctSoundRef.current?.play().catch(() => { });
+
+    const newCombo = s.combo + 1;
+    const multiplier = newCombo >= 5 ? 3 : newCombo >= 3 ? 2 : 1;
+
+    setCombo(newCombo);
     setScores(prev => ({
       ...prev,
-      [s.currentUser]: prev[s.currentUser] + 10
+      [s.currentUser]: prev[s.currentUser] + (10 * multiplier)
     }));
+
+    // Time Siphon: Restore 5s
+    setTimers(prev => ({
+      ...prev,
+      [s.currentUser]: prev[s.currentUser] + 5
+    }));
+
     showAnswer(true);
   }, [showAnswer]);
 
@@ -193,6 +239,8 @@ export default function Game() {
     const s = stateRef.current;
     if (s.isAnswerShown || s.gameOver) return;
     wrongSoundRef.current?.play().catch(() => { });
+
+    setCombo(0);
     setScores(prev => ({
       ...prev,
       [s.currentUser]: Math.max(0, prev[s.currentUser] - 5)
@@ -232,7 +280,9 @@ export default function Game() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [wrongAnswer, correctAnswer, togglePause]);
 
-  if (loading) return <LoadingScreen onComplete={() => setLoading(false)} />;
+  if (loading || !dataLoaded) {
+    return <LoadingScreen onComplete={() => setLoading(false)} />;
+  }
 
   if (gameOver) {
     return (
@@ -274,16 +324,32 @@ export default function Game() {
             </button>
             <button className="btn-text-only" onClick={() => navigate('/leaderboard')}>ALL RESULTS</button>
           </div>
-        </div >
-      </div >
+        </div>
+      </div>
     );
   }
 
-  if (!dataLoaded || questions.length === 0) {
+  // Handle Fetch Error or No Questions
+  if (quizMeta?.error || questions.length === 0) {
     return (
-      <div className="page-wrapper dashboard-wrapper">
-        <div className="glass-panel" style={{ maxWidth: 500, margin: '100px auto' }}>
-          {dataLoaded ? 'NO TARGETS FOUND.' : 'INITIALISING SCAN...'}
+      <div className="page-wrapper">
+        <div className="glass-panel" style={{ textAlign: 'center', maxWidth: 500 }}>
+          <h2 style={{ color: quizMeta?.error ? 'var(--red)' : 'var(--cyan)' }}>
+            {quizMeta?.error ? 'UPLINK FAILURE' : 'NO TARGETS FOUND'}
+          </h2>
+          <p className="card-subtitle" style={{ margin: '20px 0' }}>
+            {quizMeta?.error ? quizMeta.message : 'THIS SECTOR APPEARS TO BE DEVOID OF INTELLIGENCE TARGETS.'}
+          </p>
+          <div className="button-row" style={{ flexDirection: 'column', gap: 10 }}>
+            {quizMeta?.error && (
+              <button className="btn-primary" onClick={() => window.location.reload()}>
+                RETRY CONNECTION
+              </button>
+            )}
+            <button className="btn-back" onClick={() => navigate('/categories')}>
+              ABORT MISSION
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -294,31 +360,51 @@ export default function Game() {
   const progressPercent = ((currentIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="page-wrapper dashboard-wrapper">
-      <div className="page-content" style={{ maxWidth: 900 }}>
-        <div className="game-container">
+    <div className="page-wrapper">
+      <div className="arena-layout">
 
-          {/* HUD Modules */}
-          <div className="hud-row">
-            <div className={`hud-timer-module ${currentUser === 1 ? 'active' : ''} ${timers[1] <= 30 ? 'warning' : ''}`}>
-              <div className="hud-player-info">
-                <span className="hud-player-name">{player1}</span>
-                <span className="hud-score">{scores[1]} PTS</span>
-              </div>
-              <div className="hud-time-display">{formatTime(timers[1])}</div>
-            </div>
-            <div className={`hud-timer-module ${currentUser === 2 ? 'active' : ''} ${timers[2] <= 30 ? 'warning' : ''}`}>
-              <div className="hud-player-info">
-                <span className="hud-player-name">{player2}</span>
-                <span className="hud-score">{scores[2]} PTS</span>
-              </div>
-              <div className="hud-time-display">{formatTime(timers[2])}</div>
+        {/* Left Wing: Player 1 Neural State */}
+        <div className={`hud-peripheral left ${currentUser === 1 ? 'active' : ''}`}>
+          <div className="calibration-step">NEURAL SIGNATURE: {player1}</div>
+          <div className="hud-score-large">{scores[1]} <span style={{ fontSize: '10px', opacity: 0.5 }}>PTS</span></div>
+
+          <div className="energy-cell-group">
+            <div className="energy-label">NEURAL ENERGY <span>{formatTime(timers[1])}</span></div>
+            <div className="energy-track">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`energy-segment ${timers[1] > (i * 6) ? 'filled' : ''}`}
+                  style={{
+                    backgroundColor: timers[1] <= 10 ? 'var(--red)' :
+                      timers[1] <= 30 ? 'var(--gold)' : 'var(--cyan)'
+                  }}
+                />
+              ))}
             </div>
           </div>
 
-          {/* Scanning Viewport */}
-          <div className="scanning-viewport">
+          <div className="energy-label" style={{ marginTop: 10 }}>UPLINK STABILITY <span>98.4%</span></div>
+        </div>
+
+        {/* Central Combat Node */}
+        <div className="combat-node">
+          <div className="combat-data-bar">
+            <span>SECTOR: {quizMeta?.category?.toUpperCase()}</span>
+            <span>TARGET: {currentIndex + 1} / {questions.length}</span>
+            <span>OPS: ACTIVE</span>
+          </div>
+
+          <div className={`holo-viewport ${glitchActive ? 'glitch-active' : ''}`}>
             <img src={imageUrl} alt="Target" className="question-img-premium" />
+
+            <div className="target-aim-overlay"></div>
+
+            {/* Combo Multiplier */}
+            <div className={`combo-display ${combo >= 3 ? 'show' : ''}`} style={{ top: '20px', right: '20px' }}>
+              COMBO x{combo >= 5 ? '3' : '2'}
+            </div>
+
             <div className="scanning-overlay"></div>
             <div className="scanning-line"></div>
 
@@ -348,39 +434,47 @@ export default function Game() {
             )}
           </div>
 
-          {/* Progress & Meta */}
-          <div className="game-meta-row">
-            <div className="hud-progress-module">
-              <div className="hud-progress-header">
-                PROGRESS <span>SCAN {currentIndex + 1} / {questions.length}</span>
-              </div>
-              <div className="hud-progress-track">
-                <div className="hud-progress-fill" style={{ width: `${progressPercent}%` }}></div>
-              </div>
-            </div>
-            <div className="hud-actions">
-              <button className="btn-hud" onClick={() => {
-                clearInterval(intervalRef.current);
-                tickTockRef.current?.pause();
-                navigate('/categories');
-              }}>ABORT</button>
-            </div>
+          <div className="arena-actions-bar">
+            <button className="btn-hud" onClick={() => {
+              clearInterval(intervalRef.current);
+              tickTockRef.current?.pause();
+              navigate('/categories');
+            }}>ABORT MISSION</button>
+            <button className="btn-hud" onClick={togglePause}>{isPaused ? 'RESUME' : 'PAUSE'}</button>
           </div>
 
           {/* Keyboard Hints */}
-          <div className="hud-keyboard-hints">
-            <div className="hint-item">
-              <span className="key-cap">←</span> NO MATCH
-            </div>
-            <div className="hint-item">
-              <span className="key-cap">→</span> IDENTIFIED
-            </div>
-            <div className="hint-item">
-              <span className="key-cap">SPACE</span> PAUSE
+          <div className="hud-keyboard-hints" style={{ marginTop: 30 }}>
+            <div className="hint-item"><span className="key-cap">←</span> NO MATCH</div>
+            <div className="hint-item"><span className="key-cap">→</span> IDENTIFIED</div>
+            <div className="hint-item"><span className="key-cap">SPACE</span> PAUSE</div>
+          </div>
+        </div>
+
+        {/* Right Wing: Player 2 Neural State */}
+        <div className={`hud-peripheral right ${currentUser === 2 ? 'active' : ''}`}>
+          <div className="calibration-step">NEURAL SIGNATURE: {player2}</div>
+          <div className="hud-score-large">{scores[2]} <span style={{ fontSize: '10px', opacity: 0.5 }}>PTS</span></div>
+
+          <div className="energy-cell-group">
+            <div className="energy-label">NEURAL ENERGY <span>{formatTime(timers[2])}</span></div>
+            <div className="energy-track">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`energy-segment ${timers[2] > (i * 6) ? 'filled' : ''}`}
+                  style={{
+                    backgroundColor: timers[2] <= 10 ? 'var(--red)' :
+                      timers[2] <= 30 ? 'var(--gold)' : 'var(--cyan)'
+                  }}
+                />
+              ))}
             </div>
           </div>
 
+          <div className="energy-label" style={{ marginTop: 10 }}>UPLINK STABILITY <span>98.4%</span></div>
         </div>
+
       </div>
     </div>
   );

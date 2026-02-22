@@ -1,26 +1,20 @@
 import { useEffect } from 'react';
+import './AnimatedBackground.css';
 
 export default function AnimatedBackground() {
   useEffect(() => {
     const createParticle = () => {
-      const type = Math.random() > 0.5 ? 'glitch' : 'binary';
       const particle = document.createElement('div');
+      particle.className = 'particle-premium particle-glitch';
+      particle.style.left = `${Math.random() * 100}vw`;
+      particle.style.bottom = '0';
+      particle.style.animationDuration = `${Math.random() * 4 + 3}s`;
 
-      if (type === 'glitch') {
-        particle.className = 'particle-premium particle-glitch';
-        particle.style.left = `${Math.random() * 100}vw`;
-        particle.style.bottom = '0';
-        particle.style.animationDuration = `${Math.random() * 4 + 3}s`;
-      } else {
-        particle.className = 'particle-premium particle-binary';
-        particle.innerText = Math.random() > 0.5 ? '0' : '1';
-        particle.style.left = `${Math.random() * 100}vw`;
-        particle.style.bottom = '0';
-        particle.style.animationDuration = `${Math.random() * 6 + 4}s`;
+      const container = document.getElementById('bg-particles');
+      if (container) {
+        container.appendChild(particle);
+        particle.addEventListener('animationend', () => particle.remove());
       }
-
-      document.getElementById('bg-particles')?.appendChild(particle);
-      particle.addEventListener('animationend', () => particle.remove());
     };
 
     const createStreak = () => {
