@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store
+
+# Build outputs
+dist/
+build/
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
