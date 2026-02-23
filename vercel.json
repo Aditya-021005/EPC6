@@ -5,8 +5,7 @@
       "src": "backend/core/wsgi.py",
       "use": "@vercel/python",
       "config": {
-        "maxLambdaSize": "15mb",
-        "runtime": "python3.9",
+        "runtime": "python3.11",
         "excludeFiles": "backend/static/**"
       }
     },
@@ -16,32 +15,32 @@
       "config": {
         "distDir": "dist"
       }
+    },
+    {
+      "src": "backend/static/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/core/wsgi.py"
+      "dest": "/backend/core/wsgi.py"
     },
     {
       "src": "/admin/(.*)",
-      "dest": "backend/core/wsgi.py"
+      "dest": "/backend/core/wsgi.py"
     },
     {
       "src": "/static/(.*)",
-      "dest": "backend/core/wsgi.py"
+      "dest": "/backend/static/$1"
     },
     {
       "src": "/images/(.*)",
-      "dest": "backend/static/images/$1"
+      "dest": "/backend/static/images/$1"
     },
     {
       "src": "/sounds/(.*)",
-      "dest": "backend/static/sounds/$1"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "dest": "/backend/static/sounds/$1"
     },
     {
       "handle": "filesystem"
