@@ -136,21 +136,21 @@ def get_dashboard_data(request):
                 'value': category_count,
                 'progress': min(100, (category_count / 15) * 100), # Assume 15 max for now
                 'theme': 'cyan-theme',
-                'icon': '📊'
+                'icon': ''
             },
             {
                 'label': 'Operations Run',
                 'value': match_count,
                 'progress': min(100, (match_count / 50) * 100), # Target 50
                 'theme': 'gold-theme',
-                'icon': '🔥'
+                'icon': ''
             },
             {
                 'label': 'Targets Identified',
                 'value': question_count,
                 'progress': min(100, (question_count / 1000) * 100), # Target 1000
                 'theme': 'magenta-theme',
-                'icon': '🎯'
+                'icon': ''
             },
         ],
         'recentMatches': match_list,

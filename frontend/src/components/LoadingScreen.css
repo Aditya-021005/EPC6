@@ -251,3 +251,58 @@
     transform: translateX(0);
   }
 }
+
+@media (max-width: 768px) {
+  .tactical-loader-container {
+    gap: 30px;
+    padding: 0 20px;
+  }
+
+  .neural-radar {
+    width: 130px;
+    height: 130px;
+  }
+
+  .loader-status {
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  .loader-terminal-log {
+    height: 60px;
+    font-size: 8px;
+    margin-bottom: 15px;
+  }
+
+  .loader-header {
+    font-size: 8px;
+    letter-spacing: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tactical-loader-container {
+    gap: 24px;
+  }
+
+  .neural-radar {
+    width: 100px;
+    height: 100px;
+    border-width: 2px;
+  }
+
+  .loader-status {
+    font-size: 11px;
+    letter-spacing: 1px;
+    gap: 6px;
+  }
+
+  .status-blink {
+    width: 6px;
+    height: 6px;
+  }
+
+  .loader-progress-labels {
+    font-size: 9px;
+  }
+}

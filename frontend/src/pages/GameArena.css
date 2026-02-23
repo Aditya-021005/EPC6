@@ -321,6 +321,83 @@
   color: var(--cyan);
 }
 
+.arena-actions-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  margin-top: 40px;
+}
+
+.hud-utility-btns {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+}
+
+.mobile-touch-controls {
+  display: none;
+  /* Hidden by default, shown on mobile */
+  width: 100%;
+  gap: 20px;
+  justify-content: center;
+}
+
+.touch-btn {
+  flex: 1;
+  max-width: 180px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-md);
+  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-weight: 800;
+  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.touch-btn .btn-icon {
+  font-size: 24px;
+}
+
+.touch-btn .btn-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+.touch-btn.reject {
+  background: rgba(255, 51, 85, 0.1);
+  border: 1px solid rgba(255, 51, 85, 0.4);
+  color: var(--red);
+  box-shadow: inset 0 0 20px rgba(255, 51, 85, 0.1);
+}
+
+.touch-btn.reject:active {
+  background: rgba(255, 51, 85, 0.3);
+  transform: scale(0.95);
+  box-shadow: 0 0 30px var(--red-glow);
+}
+
+.touch-btn.identify {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  color: var(--green);
+  box-shadow: inset 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+.touch-btn.identify:active {
+  background: rgba(0, 255, 136, 0.3);
+  transform: scale(0.95);
+  box-shadow: 0 0 30px var(--green-glow);
+}
+
 /* Keyboard Hint Premium */
 .hud-keyboard-hints {
   display: flex;
@@ -727,11 +804,144 @@
     height: auto;
     overflow-y: auto;
     padding: 20px;
+    gap: 20px;
   }
 
   .hud-peripheral {
     width: 100% !important;
     transform: none !important;
     animation: fadeIn 0.5s forwards !important;
+    padding: 15px;
+  }
+
+  .hud-peripheral.active::after {
+    font-size: 10px;
+    top: -10px;
+  }
+
+  .combat-node {
+    width: 100%;
+    max-width: unset;
+  }
+}
+
+@media (max-width: 768px) {
+  .arena-layout {
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .paused-text {
+    font-size: 20px;
+    /* Even smaller to be safe */
+    letter-spacing: 4px;
+    margin-right: -4px;
+    /* Counteract letter-spacing for true centering */
+    text-align: center;
+    width: 100%;
+  }
+
+  .paused-screen {
+    gap: 12px;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hud-peripheral {
+    padding: 20px 15px 15px 15px !important;
+    /* Added top padding to create space for the tag */
+  }
+
+  .hud-peripheral.active::after {
+    font-size: 8px;
+    top: -10px;
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .hud-time-display {
+    font-size: 20px;
+  }
+
+  .hud-score-large {
+    font-size: 20px;
+    margin: 2px 0;
+  }
+
+  .feedback-message {
+    font-size: 22px;
+    letter-spacing: 2px;
+    padding: 16px 24px;
+  }
+
+  .arena-actions-bar {
+    margin-top: 20px;
+    gap: 16px;
+  }
+
+  .touch-btn {
+    height: 60px;
+    /* Reduced from 80px */
+    max-width: 140px;
+    /* Reduced from 180px */
+    gap: 4px;
+  }
+
+  .touch-btn .btn-icon {
+    font-size: 18px;
+  }
+
+  .touch-btn .btn-label {
+    font-size: 9px;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-touch-controls {
+    display: flex !important;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .hud-utility-btns {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .btn-hud {
+    flex: 1;
+    font-size: 10px;
+    padding: 8px 4px;
+  }
+
+  .hud-keyboard-hints {
+    display: none;
+  }
+
+  .combat-data-bar {
+    font-size: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .arena-layout {
+    padding: 10px;
+  }
+
+  .holo-viewport {
+    border-width: 1px;
+  }
+
+  .combat-data-bar {
+    font-size: 8px;
+    padding: 5px 10px;
   }
 }

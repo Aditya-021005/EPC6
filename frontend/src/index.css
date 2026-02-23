@@ -60,15 +60,21 @@
 
 /* ===== BASE STYLES ===== */
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
 body {
   font-family: var(--font-body);
   font-weight: 500;
   background: var(--bg-dark);
   color: var(--text-primary);
   min-height: 100vh;
-  margin: 0;
-  overflow-x: hidden;
-  position: relative;
 }
 
 /* Animated mesh gradient background */
@@ -376,4 +382,46 @@ body::before {
 .form-input:focus {
   border-color: var(--cyan);
   box-shadow: 0 0 0 3px var(--cyan-dim), 0 0 20px var(--cyan-glow);
+}
+
+/* ===== RESPONSIVENESS ===== */
+
+@media (max-width: 768px) {
+  .page-wrapper {
+    padding: 16px;
+  }
+
+  .glass-container {
+    padding: 32px 20px;
+    border-radius: var(--radius-lg);
+  }
+
+  .title-glow {
+    font-size: 32px;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+
+  .button-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .btn-primary,
+  .btn-primary-glitch {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 14px;
+  }
 }

@@ -334,3 +334,36 @@
     transform: translateY(0);
   }
 }
+
+/* ===== SELECTION RESPONSIVENESS ===== */
+
+@media (max-width: 768px) {
+  .selection-revamp-container {
+    padding: 20px 16px;
+  }
+
+  .mission-header .section-title {
+    font-size: 32px;
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+  }
+
+  .mission-header .card-subtitle {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .category-card {
+    padding: 20px;
+    min-height: 120px;
+  }
+
+  .card-title {
+    font-size: 18px;
+  }
+}

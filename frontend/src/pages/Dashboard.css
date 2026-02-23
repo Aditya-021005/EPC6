@@ -221,6 +221,12 @@
   transform: translateX(8px);
 }
 
+.op-info {
+  flex: 1;
+  min-width: 0;
+  /* Prevent flex blowout */
+}
+
 .op-status-marker {
   width: 4px;
   height: 44px;
@@ -241,6 +247,9 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 6px;
+  flex-wrap: wrap;
+  /* Handle long names */
+  word-break: break-word;
 }
 
 .winner-glow {
@@ -336,6 +345,8 @@
   color: var(--gold);
   margin-bottom: 6px;
   text-shadow: 0 0 15px var(--gold-glow);
+  word-break: break-word;
+  /* Prevent overflow */
 }
 
 .mvp-stats {
@@ -520,4 +531,124 @@
   background: var(--gold-dim);
   color: var(--gold);
   border: 1px solid rgba(255, 204, 0, 0.3);
+}
+
+/* ===== DASHBOARD RESPONSIVENESS ===== */
+
+@media (max-width: 1000px) {
+  .dashboard-layout-main {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .side-panels {
+    order: -1;
+    /* Move MVP and Status up or stay down? Usually stay down is better for content. Let's keep default order but stack. */
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: center;
+    /* Center on mobile */
+    text-align: center;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .dashboard-header .title-glow {
+    font-size: 34px;
+    letter-spacing: 3px;
+    word-break: break-word;
+  }
+
+  .stats-grid-premium {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 columns for a more compact look */
+    gap: 12px;
+  }
+
+  .stat-card-premium {
+    padding: 16px;
+    gap: 8px;
+    min-height: unset;
+  }
+
+  .stat-card-premium:last-child {
+    grid-column: span 2;
+    /* Last one takes full width but remains short */
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .stat-icon {
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    margin: 4px 0;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .stat-progress {
+    height: 2px;
+    margin-top: 4px;
+  }
+
+  .score-badge {
+    min-width: 38px;
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+
+  .mvp-avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 28px;
+  }
+
+  .mvp-name {
+    font-size: 20px;
+  }
+
+  .glass-panel {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header .title-glow {
+    font-size: 28px;
+    letter-spacing: 2px;
+  }
+
+  .stat-value {
+    font-size: 32px;
+  }
+
+  .op-item-premium {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .op-status-marker {
+    width: 60%;
+    height: 2px;
+    margin: 0 auto;
+  }
+
+  .op-players {
+    justify-content: center;
+    font-size: 13px;
+  }
 }

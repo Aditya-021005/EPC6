@@ -435,19 +435,33 @@ export default function Game() {
           </div>
 
           <div className="arena-actions-bar">
-            <button className="btn-hud" onClick={() => {
-              clearInterval(intervalRef.current);
-              tickTockRef.current?.pause();
-              navigate('/categories');
-            }}>ABORT MISSION</button>
-            <button className="btn-hud" onClick={togglePause}>{isPaused ? 'RESUME' : 'PAUSE'}</button>
-          </div>
+            {/* Desktop Keyboard Hints (Hidden on mobile via CSS) */}
+            <div className="hud-keyboard-hints desktop-only">
+              <div className="hint-item"><span className="key-cap">←</span> NO MATCH</div>
+              <div className="hint-item"><span className="key-cap">→</span> IDENTIFIED</div>
+              <div className="hint-item"><span className="key-cap">SPACE</span> PAUSE</div>
+            </div>
 
-          {/* Keyboard Hints */}
-          <div className="hud-keyboard-hints" style={{ marginTop: 30 }}>
-            <div className="hint-item"><span className="key-cap">←</span> NO MATCH</div>
-            <div className="hint-item"><span className="key-cap">→</span> IDENTIFIED</div>
-            <div className="hint-item"><span className="key-cap">SPACE</span> PAUSE</div>
+            {/* Mobile Touch Controls (Visible only on mobile via CSS) */}
+            <div className="mobile-touch-controls">
+              <button className="btn-hud touch-btn reject" onClick={wrongAnswer}>
+                <span className="btn-icon">✖</span>
+                <span className="btn-label">REJECT</span>
+              </button>
+              <button className="btn-hud touch-btn identify" onClick={correctAnswer}>
+                <span className="btn-icon">✔</span>
+                <span className="btn-label">IDENTIFY</span>
+              </button>
+            </div>
+
+            <div className="hud-utility-btns">
+              <button className="btn-hud" onClick={togglePause}>{isPaused ? 'RESUME' : 'PAUSE'}</button>
+              <button className="btn-hud" onClick={() => {
+                clearInterval(intervalRef.current);
+                tickTockRef.current?.pause();
+                navigate('/categories');
+              }}>ABORT</button>
+            </div>
           </div>
         </div>
 
