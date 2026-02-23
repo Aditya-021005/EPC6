@@ -6,7 +6,8 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "runtime": "python3.9"
+        "runtime": "python3.9",
+        "excludeFiles": "backend/static/**"
       }
     },
     {
@@ -17,11 +18,6 @@
       }
     }
   ],
-  "functions": {
-    "backend/core/wsgi.py": {
-      "excludeFiles": "backend/static/**"
-    }
-  },
   "routes": [
     {
       "src": "/api/(.*)",
