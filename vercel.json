@@ -17,6 +17,11 @@
       }
     }
   ],
+  "functions": {
+    "backend/core/wsgi.py": {
+      "excludeFiles": "backend/static/**"
+    }
+  },
   "routes": [
     {
       "src": "/api/(.*)",
@@ -32,11 +37,11 @@
     },
     {
       "src": "/images/(.*)",
-      "dest": "/static/images/$1"
+      "dest": "backend/static/images/$1"
     },
     {
       "src": "/sounds/(.*)",
-      "dest": "/static/sounds/$1"
+      "dest": "backend/static/sounds/$1"
     },
     {
       "src": "/assets/(.*)",
