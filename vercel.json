@@ -6,7 +6,12 @@
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.11",
-        "excludeFiles": "backend/static/**"
+        "excludeFiles": "backend/static/**",
+        "includeFiles": [
+          "backend/core/db.sqlite3",
+          "backend/quiz/**",
+          "backend/requirements.txt"
+        ]
       }
     },
     {
