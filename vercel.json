@@ -6,7 +6,6 @@
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.11",
-        "excludeFiles": "{static/**,venv/**}",
         "includeFiles": [
           "core/**",
           "quiz/**",
@@ -23,7 +22,7 @@
       }
     },
     {
-      "src": "backend/static/**/*",
+      "src": "static/**/*",
       "use": "@vercel/static"
     }
   ],
@@ -38,15 +37,15 @@
     },
     {
       "src": "/static/(.*)",
-      "dest": "backend/static/$1"
+      "dest": "static/$1"
     },
     {
       "src": "/images/(.*)",
-      "dest": "backend/static/images/$1"
+      "dest": "static/images/$1"
     },
     {
       "src": "/sounds/(.*)",
-      "dest": "backend/static/sounds/$1"
+      "dest": "static/sounds/$1"
     },
     {
       "src": "/assets/(.*)",
