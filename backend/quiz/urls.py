@@ -8,5 +8,6 @@ urlpatterns = [
     path('leaderboard', views.leaderboard),
     path('dashboard-data', views.get_dashboard_data),
     path('admin/stats', views.get_stats),
+    path('health-check', views.health_check),
 ]
 

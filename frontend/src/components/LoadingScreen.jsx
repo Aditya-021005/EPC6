@@ -1,42 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './LoadingScreen.css';
 
 export default function LoadingScreen({ onComplete }) {
   const [progress, setProgress] = useState(0);
   const [hide, setHide] = useState(false);
-
   const [statusIndex, setStatusIndex] = useState(0);
+  const [glitchText, setGlitchText] = useState(false);
+  const completedRef = useRef(false);
+
   const statusMessages = [
-    "SYNCING SATELLITE UPLINK...",
-    "ESTABLISHING NEURAL CONNECTION...",
-    "SCANNING AREA FOR BIOMETRIC TRACES...",
-    "DECRYPTING MISSION DATA PACKETS...",
-    "CALIBRATING COMBAT HUD...",
-    "BYPASSING SECURITY FIREWALLS...",
-    "NEURAL LINK ESTABLISHED."
+    { text: "BOOTING NEURAL INTERFACE", icon: "◈", sys: "SYS" },
+    { text: "SYNCING SATELLITE UPLINK", icon: "◎", sys: "NET" },
+    { text: "SCANNING BIOMETRIC SIGNATURES", icon: "◉", sys: "BIO" },
+    { text: "DECRYPTING MISSION PACKETS", icon: "◆", sys: "SEC" },
+    { text: "CALIBRATING COMBAT HUD", icon: "◇", sys: "HUD" },
+    { text: "BYPASSING FIREWALLS", icon: "◈", sys: "FWL" },
+    { text: "LOADING TACTICAL ASSETS", icon: "◊", sys: "AST" },
+    { text: "ALL SYSTEMS NOMINAL", icon: "●", sys: "RDY" },
   ];
 
   useEffect(() => {
     const statusInterval = setInterval(() => {
-      setStatusIndex(prev => (prev < statusMessages.length - 1 ? prev + 1 : prev));
-    }, 1200);
+      setStatusIndex(prev => {
+        if (prev < statusMessages.length - 1) {
+          setGlitchText(true);
+          setTimeout(() => setGlitchText(false), 200);
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, 800);
 
     const progressInterval = setInterval(() => {
       setProgress(prev => {
-        const next = prev + Math.random() * 8 + 2;
+        const next = prev + Math.random() * 5 + 2;
         if (next >= 100) {
           clearInterval(progressInterval);
           clearInterval(statusInterval);
           setStatusIndex(statusMessages.length - 1);
-          setTimeout(() => {
-            setHide(true);
-            setTimeout(() => onComplete?.(), 800);
-          }, 500);
+          if (!completedRef.current) {
+            completedRef.current = true;
+            setTimeout(() => {
+              setHide(true);
+              setTimeout(() => onComplete?.(), 700);
+            }, 500);
+          }
           return 100;
         }
         return next;
       });
-    }, 150);
+    }, 100);
 
     return () => {
       clearInterval(statusInterval);
@@ -44,53 +57,74 @@ export default function LoadingScreen({ onComplete }) {
     };
   }, [onComplete]);
 
+  const currentStatus = statusMessages[statusIndex];
+
   return (
     <div className={`loading-screen ${hide ? 'hide' : ''}`}>
-      <div className="tactical-loader-container">
-        {/* Radar Scanner */}
-        <div className="neural-radar">
-          <div className="radar-sweep"></div>
+      {/* Ambient effects */}
+      <div className="loader-ambient-grid" />
+      <div className="loader-scan-line" />
 
-          {/* Extra Rotating Rings */}
-          <div className="radar-rings-extra">
-            <div className="radar-ring cw" style={{ width: '85%', height: '85%', borderStyle: 'dotted' }}></div>
-            <div className="radar-ring ccw" style={{ width: '50%', height: '50%', opacity: 0.4 }}></div>
-          </div>
+      <div className="loader-main">
 
-          <div className="radar-circles">
-            <div className="circle"></div>
-            <div className="circle"></div>
-            <div className="circle"></div>
+        {/* Core spinner */}
+        <div className="loader-core-wrap">
+          <div className="hex-spinner">
+            <div className="hex-ring outer" />
+            <div className="hex-ring middle" />
+            <div className="hex-ring inner" />
+            <div className="hex-core">
+              <span className="hex-percent">{Math.round(progress)}</span>
+            </div>
           </div>
-          <div className="radar-dots">
-            <div className="dot" style={{ top: '20%', left: '30%' }}></div>
-            <div className="dot" style={{ top: '60%', left: '70%' }}></div>
-            <div className="dot" style={{ top: '40%', left: '80%' }}></div>
-            <div className="dot" style={{ top: '75%', left: '20%', animationDelay: '0.5s' }}></div>
+          {/* Orbital dots */}
+          <div className="orbital-ring">
+            <div className="orbital-dot d1" />
+            <div className="orbital-dot d2" />
+            <div className="orbital-dot d3" />
           </div>
         </div>
 
-        {/* Status Readout */}
-        <div className="loader-hud">
-          <div className="loader-header">MISSION INITIALIZATION</div>
-          <div className="loader-status">
-            <span className="status-blink"></span>
-            {statusMessages[statusIndex]}
+        {/* Title */}
+        <div className="loader-brand">
+          <div className="loader-brand-title">SECONDS TO <span>SURVIVE</span></div>
+          <div className="loader-brand-sub">COMBAT SYSTEMS v2.0</div>
+        </div>
+
+        {/* Status panel */}
+        <div className="loader-panel">
+          <div className={`loader-current-status ${glitchText ? 'glitch' : ''}`}>
+            <span className="status-sys-tag">[{currentStatus.sys}]</span>
+            <span className="status-icon">{currentStatus.icon}</span>
+            <span className="status-text">{currentStatus.text}</span>
           </div>
 
-          <div className="loader-terminal-log">
+          {/* Terminal log */}
+          <div className="loader-log">
             {statusMessages.slice(0, statusIndex).map((msg, i) => (
-              <div key={i} className="log-entry">{'>'} {msg} [OK]</div>
+              <div key={i} className="loader-log-line">
+                <span className="log-tag">[{msg.sys}]</span>
+                <span className="log-msg">{msg.text}</span>
+                <span className="log-ok">OK</span>
+              </div>
             ))}
           </div>
 
-          <div className="loader-progress-module">
-            <div className="loader-progress-labels">
-              <span>UPLINK DATA</span>
-              <span>{Math.round(progress)}%</span>
+          {/* Progress bar */}
+          <div className="loader-progress-wrap">
+            <div className="loader-prog-header">
+              <span>UPLINK PROGRESS</span>
+              <span className="loader-prog-pct">{Math.round(progress)}%</span>
             </div>
-            <div className="loader-progress-track">
-              <div className="loader-progress-fill" style={{ width: `${progress}%` }}></div>
+            <div className="loader-prog-track">
+              <div
+                className="loader-prog-fill"
+                style={{ width: `${progress}%` }}
+              />
+              <div
+                className="loader-prog-glow"
+                style={{ left: `${progress}%` }}
+              />
             </div>
           </div>
         </div>

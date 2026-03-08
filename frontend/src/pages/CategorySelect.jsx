@@ -1,108 +1,140 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useSound from '../hooks/useSound';
 import './Selection.css';
 
 const ITEMS_PER_PAGE = 6;
+
+// Color themes for cards
+const CARD_THEMES = ['cyan', 'magenta', 'gold', 'cyan', 'gold', 'magenta'];
 
 export default function CategorySelect() {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const { play: playClick } = useSound('/sounds/click.mp3', { volume: 0.6 });
+  const { play: playHover } = useSound('/sounds/hover.mp3', { volume: 0.4 });
 
   useEffect(() => {
     fetch('/api/categories')
       .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error('Failed to load categories:', err));
+      .then(data => { setCategories(data); setLoading(false); })
+      .catch(err => { console.error('Failed to load categories:', err); setLoading(false); });
   }, []);
 
-  // Filter categories based on search
   const filteredCategories = useMemo(() => {
     return categories.filter(cat =>
       cat.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [categories, searchTerm]);
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredCategories.length / ITEMS_PER_PAGE);
   const paginatedCategories = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredCategories.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredCategories, currentPage]);
 
-  // Reset page when search changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
+  useEffect(() => { setCurrentPage(1); }, [searchTerm]);
 
   return (
     <div className="page-wrapper">
-      <div className="selection-revamp-container">
-        <div className="mission-header">
-          <h1 className="section-title">MISSION <span>SELECT</span></h1>
-          <p className="card-subtitle">CHOOSE YOUR SECTOR OF OPERATION</p>
+      <div className="sel-container">
+        {/* Header */}
+        <div className="sel-header">
+          <div className="sel-badge">
+            <span className="sel-badge-dot" />
+            <span>TACTICAL DATABASE</span>
+          </div>
+          <h1 className="sel-title">MISSION <span>SELECT</span></h1>
+          <p className="sel-desc">CHOOSE YOUR SECTOR OF OPERATION</p>
         </div>
 
-        <div className="search-uplink-wrapper">
-          <span className="search-icon">📡</span>
+        {/* Search */}
+        <div className="sel-search-wrap">
+          <div className="sel-search-icon">⌕</div>
           <input
             type="text"
-            className="search-uplink"
-            placeholder="SCANNING FOR SECTORS..."
+            className="sel-search"
+            placeholder="SCAN SECTORS..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <div className="sel-search-line" />
         </div>
 
-        <div className="category-grid" style={{ minHeight: '340px', width: '100%' }}>
-          {paginatedCategories.length > 0 ? (
+        {/* Grid */}
+        <div className="sel-grid">
+          {loading ? (
+            <div className="sel-empty">
+              <div className="sel-loading-pulse" />
+              <span>SCANNING DATABASE...</span>
+            </div>
+          ) : paginatedCategories.length > 0 ? (
             paginatedCategories.map((cat, idx) => (
               <div
                 key={cat.slug}
-                className="category-card"
-                style={{ animationDelay: `${idx * 0.1}s` }}
-                onClick={() => navigate(`/categories/${cat.slug}`)}
+                className={`sel-card theme-${CARD_THEMES[idx % CARD_THEMES.length]}`}
+                style={{ animationDelay: `${idx * 0.08}s` }}
+                onMouseEnter={playHover}
+                onClick={() => { playClick(); navigate(`/categories/${cat.slug}`); }}
               >
-                <div className="sector-status">SECTOR {cat.id.toString().padStart(2, '0')}: ACTIVE</div>
-                <div className="card-title">{cat.name}</div>
-                <div className="card-subtitle">{cat.subcategoryCount} Mission Modules Available</div>
+                <div className="sel-card-accent" />
+                <div className="sel-card-header">
+                  <span className="sel-sector-id">SEC-{cat.id.toString().padStart(2, '0')}</span>
+                  <span className="sel-card-status">● ACTIVE</span>
+                </div>
+                <div className="sel-card-name">{cat.name}</div>
+                <div className="sel-card-footer">
+                  <span className="sel-card-meta">{cat.subcategoryCount || '—'} MODULES</span>
+                  <span className="sel-card-arrow">→</span>
+                </div>
               </div>
             ))
           ) : (
-            <div className="glass-panel" style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
-              NO CORRESPONDING SECTORS FOUND.
+            <div className="sel-empty">
+              <span>NO SECTORS MATCH YOUR QUERY</span>
             </div>
           )}
         </div>
 
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="pagination-row">
+          <div className="sel-pagination">
             <button
-              className="btn-tactical-nav"
+              className="sel-page-btn"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage(prev => prev - 1)}
+              onMouseEnter={playHover}
+              onClick={() => { playClick(); setCurrentPage(prev => prev - 1); }}
             >
-              PREVIOUS
+              ← PREV
             </button>
-            <div className="page-indicator">
-              PAGE <span>{currentPage}</span> OF {totalPages}
+            <div className="sel-page-info">
+              <span className="sel-page-current">{currentPage}</span>
+              <span className="sel-page-sep">/</span>
+              <span>{totalPages}</span>
             </div>
             <button
-              className="btn-tactical-nav"
+              className="sel-page-btn"
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(prev => prev + 1)}
+              onMouseEnter={playHover}
+              onClick={() => { playClick(); setCurrentPage(prev => prev + 1); }}
             >
-              NEXT
+              NEXT →
             </button>
           </div>
         )}
 
-        <div className="button-row" style={{ marginTop: 40 }}>
-          <button className="btn-back" onClick={() => navigate('/')}>
-            ← ABORT MISSION
-          </button>
-        </div>
+        {/* Back */}
+        <button
+          className="sel-back-btn"
+          onMouseEnter={playHover}
+          onClick={() => { playClick(); navigate('/'); }}
+        >
+          <span>←</span> ABORT MISSION
+        </button>
       </div>
     </div>
   );

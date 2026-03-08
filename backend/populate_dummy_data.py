@@ -5,7 +5,7 @@ import random
 from datetime import datetime, timedelta
 
 # Add project root to path
-sys.path.append('/Users/aditya/Desktop/EPC6/server_django')
+sys.path.append(os.path.join(os.path.dirname(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 

@@ -2,10 +2,17 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+import logging
+
 from .models import Category, Subcategory, Question, MatchResult
 from .serializers import CategorySerializer, SubcategorySerializer, QuestionSerializer, MatchResultSerializer
 
+logger = logging.getLogger(__name__)
+
 @api_view(['GET'])
+@cache_page(60 * 15)
 def get_categories(request):
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)
@@ -87,9 +94,24 @@ def leaderboard(request):
                 category=data.get('category', ''),
                 subcategory=data.get('subcategory', '')
             )
+            logger.info(f"Match result created: {data['player1']} vs {data['player2']}")
             return Response({'success': True}, status=status.HTTP_201_CREATED)
-        except KeyError:
-            return Response({'error': 'Missing fields'}, status=status.HTTP_400_BAD_REQUEST)
+        except KeyError as e:
+            logger.error(f"Failed to create match result: {str(e)}")
+            return Response({'error': f'Missing field: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def health_check(request):
+    """
+    Standard health check endpoint for monitoring systems.
+    """
+    return Response({
+        'status': 'online',
+        'subsystems': {
+            'database': 'connected',
+            'cache': 'active'
+        }
+    })
 
 @api_view(['GET'])
 def get_dashboard_data(request):

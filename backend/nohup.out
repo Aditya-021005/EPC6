@@ -1,0 +1,68 @@
+Watching for file changes with StatReloader
+INFO 2026-03-07 19:48:53,646 autoreload Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+quiz.Category: (models.W042) Auto-created primary key used when not defining a primary key type, by default 'django.db.models.AutoField'.
+	HINT: Configure the DEFAULT_AUTO_FIELD setting or the QuizConfig.default_auto_field attribute to point to a subclass of AutoField, e.g. 'django.db.models.BigAutoField'.
+quiz.MatchResult: (models.W042) Auto-created primary key used when not defining a primary key type, by default 'django.db.models.AutoField'.
+	HINT: Configure the DEFAULT_AUTO_FIELD setting or the QuizConfig.default_auto_field attribute to point to a subclass of AutoField, e.g. 'django.db.models.BigAutoField'.
+quiz.Question: (models.W042) Auto-created primary key used when not defining a primary key type, by default 'django.db.models.AutoField'.
+	HINT: Configure the DEFAULT_AUTO_FIELD setting or the QuizConfig.default_auto_field attribute to point to a subclass of AutoField, e.g. 'django.db.models.BigAutoField'.
+quiz.Subcategory: (models.W042) Auto-created primary key used when not defining a primary key type, by default 'django.db.models.AutoField'.
+	HINT: Configure the DEFAULT_AUTO_FIELD setting or the QuizConfig.default_auto_field attribute to point to a subclass of AutoField, e.g. 'django.db.models.BigAutoField'.
+
+System check identified 4 issues (0 silenced).
+Not Found: /api/health/
+WARNING 2026-03-07 19:49:00,915 log Not Found: /api/health/
+[07/Mar/2026 19:49:00] "GET /api/health/ HTTP/1.1" 404 3998
+[07/Mar/2026 19:49:40] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[07/Mar/2026 19:49:40] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[07/Mar/2026 19:49:42] "GET /api/categories HTTP/1.1" 200 573
+[07/Mar/2026 19:49:46] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 19:49:46] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 19:49:51] "GET /api/quiz/game HTTP/1.1" 200 1490
+[07/Mar/2026 19:49:51] "GET /api/quiz/game HTTP/1.1" 200 1490
+[07/Mar/2026 19:50:42] "GET /api/quiz/game HTTP/1.1" 200 1490
+[07/Mar/2026 19:50:43] "GET /api/quiz/game HTTP/1.1" 200 1490
+[07/Mar/2026 19:55:11] "GET /api/categories HTTP/1.1" 200 573
+[07/Mar/2026 19:58:35] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[07/Mar/2026 19:58:35] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[07/Mar/2026 19:58:37] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 19:58:37] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 19:58:46] "GET /api/quiz/game HTTP/1.1" 200 1490
+[07/Mar/2026 19:58:46] "GET /api/quiz/game HTTP/1.1" 200 1490
+[07/Mar/2026 19:59:25] "GET /api/quiz/game HTTP/1.1" 200 1490
+[07/Mar/2026 20:03:20] "GET /api/categories HTTP/1.1" 200 573
+[07/Mar/2026 20:04:07] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[07/Mar/2026 20:04:07] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[07/Mar/2026 20:04:10] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 20:04:10] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 20:04:26] "GET /api/categories/sports/subcategories HTTP/1.1" 200 172
+[07/Mar/2026 20:04:26] "GET /api/categories/sports/subcategories HTTP/1.1" 200 172
+[07/Mar/2026 20:04:30] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 20:04:30] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 20:04:50] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[07/Mar/2026 20:04:50] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[07/Mar/2026 20:05:12] "GET /api/categories HTTP/1.1" 200 573
+[07/Mar/2026 20:05:17] "GET /api/categories/architecture/subcategories HTTP/1.1" 200 349
+[07/Mar/2026 20:05:17] "GET /api/categories/architecture/subcategories HTTP/1.1" 200 349
+[07/Mar/2026 20:05:21] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 20:05:21] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[07/Mar/2026 20:05:23] "GET /api/categories/icons/subcategories HTTP/1.1" 200 462
+[07/Mar/2026 20:05:23] "GET /api/categories/icons/subcategories HTTP/1.1" 200 462
+[07/Mar/2026 20:05:28] "GET /api/categories/anatomy/subcategories HTTP/1.1" 200 188
+[07/Mar/2026 20:05:28] "GET /api/categories/anatomy/subcategories HTTP/1.1" 200 188
+[07/Mar/2026 20:05:32] "GET /api/categories/countries/subcategories HTTP/1.1" 200 295
+[07/Mar/2026 20:05:32] "GET /api/categories/countries/subcategories HTTP/1.1" 200 295
+[07/Mar/2026 20:05:39] "GET /api/categories/architecture/subcategories HTTP/1.1" 200 349
+[07/Mar/2026 20:05:39] "GET /api/categories/architecture/subcategories HTTP/1.1" 200 349
+[07/Mar/2026 20:33:26] "GET /api/categories HTTP/1.1" 200 573
+[07/Mar/2026 20:48:38] "GET /api/categories HTTP/1.1" 200 573
+[08/Mar/2026 04:45:15] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[08/Mar/2026 04:45:15] "GET /api/dashboard-data HTTP/1.1" 200 1246
+[08/Mar/2026 04:45:17] "GET /api/categories HTTP/1.1" 200 573
+[08/Mar/2026 04:45:20] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[08/Mar/2026 04:45:20] "GET /api/categories/logos/subcategories HTTP/1.1" 200 380
+[08/Mar/2026 04:45:28] "GET /api/quiz/game HTTP/1.1" 200 1490
+[08/Mar/2026 04:45:28] "GET /api/quiz/game HTTP/1.1" 200 1490

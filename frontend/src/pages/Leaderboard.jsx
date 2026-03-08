@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useSound from '../hooks/useSound';
 import './Leaderboard.css';
+
+const INITIAL_SHOW = 5;
+const LOAD_MORE = 5;
 
 export default function Leaderboard() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_SHOW);
   const navigate = useNavigate();
+
+  const { play: playClick } = useSound('/sounds/click.mp3', { volume: 0.6 });
+  const { play: playHover } = useSound('/sounds/hover.mp3', { volume: 0.4 });
 
   useEffect(() => {
     fetch('/api/leaderboard')
@@ -20,13 +28,6 @@ export default function Leaderboard() {
       });
   }, []);
 
-  const getRankClass = (index) => {
-    if (index === 0) return 'top-rank-1';
-    if (index === 1) return 'top-rank-2';
-    if (index === 2) return 'top-rank-3';
-    return '';
-  };
-
   const getMedal = (index) => {
     if (index === 0) return '🥇';
     if (index === 1) return '🥈';
@@ -35,9 +36,16 @@ export default function Leaderboard() {
   };
 
   const getResultClass = (result) => {
-    if (result === 'win') return 'res-win';
-    if (result === 'loss') return 'res-loss';
-    return 'res-tie';
+    if (result === 'win') return 'lb-res-win';
+    if (result === 'loss') return 'lb-res-loss';
+    return 'lb-res-tie';
+  };
+
+  const getTheme = (index) => {
+    if (index === 0) return 'gold';
+    if (index === 1) return 'cyan';
+    if (index === 2) return 'magenta';
+    return '';
   };
 
   const formatDate = (dateStr) => {
@@ -45,85 +53,126 @@ export default function Leaderboard() {
     return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
   };
 
+  const visibleEntries = entries.slice(0, visibleCount);
+  const hasMore = visibleCount < entries.length;
+  const remaining = entries.length - visibleCount;
+
   return (
     <div className="page-wrapper">
-      <div className="page-content" style={{ maxWidth: 900 }}>
-        <div className="leaderboard-header">
-          <h1 className="leaderboard-title">HALL OF <span>FAME</span></h1>
-          <div className="leaderboard-subtitle">NEURAL LINK GLOBAL STANDINGS</div>
+      <div className="lb-container">
+
+        {/* Header */}
+        <div className="lb-header">
+          <div className="lb-badge">
+            <span className="lb-badge-dot" />
+            <span>GLOBAL STANDINGS</span>
+          </div>
+          <h1 className="lb-title">HALL OF <span>FAME</span></h1>
+          <p className="lb-desc">NEURAL LINK COMBAT RECORDS</p>
+          {entries.length > 0 && (
+            <div className="lb-count">{entries.length} RECORDS FOUND</div>
+          )}
         </div>
 
+        {/* Content */}
         {loading ? (
-          <div className="glass-container" style={{ maxWidth: 400, margin: '20px auto' }}>
-            <div className="loading-pulse">SYNCING DATA...</div>
+          <div className="sel-empty">
+            <div className="sel-loading-pulse" />
+            <span>SYNCING DATA...</span>
           </div>
         ) : entries.length === 0 ? (
-          <div className="glass-container" style={{ maxWidth: 460, margin: '20px auto' }}>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: 20 }}>
-              NO NEURAL LINKS ESTABLISHED YET.
-            </p>
-            <button className="btn-primary-glitch" onClick={() => navigate('/categories')}>
-              INITIALIZE PROTOCOL
+          <div className="lb-empty-state">
+            <div className="lb-empty-icon">📡</div>
+            <p className="lb-empty-text">NO NEURAL LINKS ESTABLISHED YET</p>
+            <button
+              className="lb-action-btn lb-primary"
+              onClick={() => { playClick(); navigate('/categories'); }}
+              onMouseEnter={playHover}
+            >
+              <span>⚔</span> INITIALIZE PROTOCOL
             </button>
           </div>
         ) : (
-          <div className="leaderboard-container">
-            <div className="leaderboard-table-scroll">
-              <table className="lb-table">
-                <thead>
-                  <tr>
-                    <th>RANK</th>
-                    <th>PILOT IDENTITY</th>
-                    <th>COMBAT SCORE</th>
-                    <th>RESULT</th>
-                    <th>SECTOR</th>
-                    <th>TIMESTAMP</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((entry, i) => (
-                    <tr key={entry.id} className="lb-row-item">
-                      <td className={`rank-col ${getRankClass(i)}`}>
-                        {getMedal(i)}
-                      </td>
-                      <td>
-                        <div className="player-info">
-                          <span className="player-name">{entry.player}</span>
-                          <span className="player-opponent">vs {entry.opponent} ({entry.opponentScore})</span>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="score-display">{entry.score}</span>
-                      </td>
-                      <td>
-                        <span className={`res-badge ${getResultClass(entry.result)}`}>
-                          {entry.result}
-                        </span>
-                      </td>
-                      <td>
-                        <span style={{ color: 'var(--magenta)', fontSize: '12px', fontWeight: 600 }}>
-                          {entry.category?.toUpperCase() || 'CORE'}
-                        </span>
-                      </td>
-                      <td className="lb-date">
-                        {formatDate(entry.date)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <>
+            <div className="lb-list">
+              {visibleEntries.map((entry, i) => (
+                <div
+                  key={entry.id}
+                  className={`lb-entry ${getTheme(i) ? `lb-top lb-theme-${getTheme(i)}` : ''}`}
+                  style={{ animationDelay: `${(i < INITIAL_SHOW ? i : (i - visibleCount + LOAD_MORE)) * 0.06}s` }}
+                  onMouseEnter={playHover}
+                >
+                  <div className="lb-entry-accent" />
+
+                  <div className="lb-rank-cell">
+                    <span className={`lb-rank-num ${i < 3 ? 'lb-top-rank' : ''}`}>{getMedal(i)}</span>
+                  </div>
+
+                  <div className="lb-entry-main">
+                    <div className="lb-entry-top-row">
+                      <span className="lb-player-name">{entry.player}</span>
+                      <span className={`lb-result-badge ${getResultClass(entry.result)}`}>
+                        {entry.result?.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="lb-entry-bottom-row">
+                      <span className="lb-opponent">vs {entry.opponent} ({entry.opponentScore})</span>
+                      <span className="lb-meta-sep">•</span>
+                      <span className="lb-sector">{entry.category?.toUpperCase() || 'CORE'}</span>
+                      <span className="lb-meta-sep">•</span>
+                      <span className="lb-date-text">{formatDate(entry.date)}</span>
+                    </div>
+                  </div>
+
+                  <div className="lb-score-cell">
+                    <span className="lb-score-value">{entry.score}</span>
+                    <span className="lb-score-label">PTS</span>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+
+            {/* Load more */}
+            {hasMore && (
+              <button
+                className="lb-load-more"
+                onClick={() => { playClick(); setVisibleCount(prev => prev + LOAD_MORE); }}
+                onMouseEnter={playHover}
+              >
+                <span className="lb-load-icon">↓</span>
+                <span>DECRYPT {remaining > LOAD_MORE ? LOAD_MORE : remaining} MORE RECORDS</span>
+                <span className="lb-load-count">{remaining} remaining</span>
+              </button>
+            )}
+
+            {!hasMore && entries.length > INITIAL_SHOW && (
+              <div className="lb-end-marker">
+                <span className="lb-end-line" />
+                <span className="lb-end-text">ALL RECORDS DECRYPTED</span>
+                <span className="lb-end-line" />
+              </div>
+            )}
+          </>
         )}
 
-        <div className="button-row" style={{ marginTop: 40 }}>
-          <button className="btn-back" onClick={() => navigate('/')}>
-            ← TERMINAL EXIT
+        {/* Bottom Buttons */}
+        <div className="lb-bottom-actions">
+          <button
+            className="sel-back-btn"
+            onMouseEnter={playHover}
+            onClick={() => { playClick(); navigate('/'); }}
+          >
+            <span>←</span> RETURN TO BASE
           </button>
-          <button className="btn-primary-glitch" onClick={() => navigate('/categories')} style={{ padding: '12px 32px' }}>
-            RE-LINK
+          <button
+            className="lb-action-btn lb-primary"
+            onMouseEnter={playHover}
+            onClick={() => { playClick(); navigate('/categories'); }}
+          >
+            <span>⚔</span> RE-LINK
           </button>
         </div>
+
       </div>
     </div>
   );
