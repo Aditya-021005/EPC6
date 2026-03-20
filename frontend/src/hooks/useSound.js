@@ -3,12 +3,18 @@ import { useAudio } from '../context/AudioContext';
 
 const useSound = (src, options = {}) => {
   const { volume: localVolume = 1, loop = false } = options;
-  const { globalVolume } = useAudio();
+  const { globalVolume, isUnlocked } = useAudio();
   const audioRef = useRef(null);
+  const wasBlockedRef = useRef(false);
 
   useEffect(() => {
     const audio = new Audio(src);
     audio.loop = loop;
+    audio.preload = 'auto'; // Reduce lag by preloading
+
+    // Set initial volume immediately
+    audio.volume = globalVolume * localVolume;
+
     audioRef.current = audio;
 
     return () => {
@@ -35,16 +41,28 @@ const useSound = (src, options = {}) => {
 
     if (playPromise !== undefined) {
       playPromise.catch(err => {
-        // Silent catch for autoplay restrictions
-        // Console logging is handled in AudioContext for initialization
+        if (err.name === 'NotAllowedError') {
+          console.warn(`[useSound] Playback blocked for ${src}. Will retry after unlock.`);
+          wasBlockedRef.current = true;
+        }
       });
     }
-  }, []);
+  }, [src]);
+
+  // Retry playback once system is unlocked if it was previously blocked
+  useEffect(() => {
+    if (isUnlocked && wasBlockedRef.current && audioRef.current) {
+      console.log(`[useSound] System unlocked, retrying blocked playback for ${src}`);
+      wasBlockedRef.current = false;
+      audioRef.current.play().catch(() => { });
+    }
+  }, [isUnlocked, src]);
 
   const stop = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+      wasBlockedRef.current = false;
     }
   }, []);
 

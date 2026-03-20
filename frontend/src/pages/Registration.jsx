@@ -1,7 +1,63 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useSound from '../hooks/useSound';
 import './Registration.css';
+
+// Matrix Rain mini-component
+function MatrixRain({ active, color = '#00f0ff' }) {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const columnsRef = useRef([]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = 48, h = 48;
+    canvas.width = w * 2; // retina
+    canvas.height = h * 2;
+    ctx.scale(2, 2);
+
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+    const fontSize = 7;
+    const cols = Math.floor(w / fontSize);
+    columnsRef.current = Array(cols).fill(0);
+
+    const draw = () => {
+      ctx.fillStyle = `rgba(10, 10, 26, ${active ? 0.15 : 0.4})`;
+      ctx.fillRect(0, 0, w, h);
+
+      if (active) {
+        ctx.fillStyle = color;
+        ctx.font = `${fontSize}px monospace`;
+        columnsRef.current.forEach((y, i) => {
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          ctx.globalAlpha = 0.6 + Math.random() * 0.4;
+          ctx.fillText(char, i * fontSize, y * fontSize);
+          ctx.globalAlpha = 1;
+          if (y * fontSize > h && Math.random() > 0.96) {
+            columnsRef.current[i] = 0;
+          } else {
+            columnsRef.current[i] = y + 1;
+          }
+        });
+      }
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(animRef.current);
+  }, [active, color]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="matrix-rain-canvas"
+      style={{ opacity: active ? 1 : 0 }}
+    />
+  );
+}
 
 export default function Registration() {
   const { quizId } = useParams();
@@ -13,6 +69,7 @@ export default function Registration() {
 
   const { play: playClick } = useSound('/sounds/click.mp3', { volume: 0.6 });
   const { play: playHover } = useSound('/sounds/hover.mp3', { volume: 0.3 });
+  const { play: playType } = useSound('/sounds/click.mp3', { volume: 0.15 });
 
   const handleStartGame = () => {
     if (!player1.trim() || !player2.trim()) {
@@ -61,6 +118,7 @@ export default function Registration() {
           <div className={`pilot-card ${focusedField === 1 ? 'focused' : ''} ${player1.trim() ? 'filled' : ''}`}>
             <div className="pilot-card-header">
               <div className="pilot-avatar cyan-avatar">
+                <MatrixRain active={focusedField === 1 || !!player1.trim()} color="#00f0ff" />
                 <span className="avatar-icon">{player1.trim() ? player1[0].toUpperCase() : '?'}</span>
                 <div className="avatar-ring" />
               </div>
@@ -79,6 +137,7 @@ export default function Registration() {
                 placeholder="ENTER CALLSIGN"
                 value={player1}
                 onChange={e => setPlayer1(e.target.value)}
+                onInput={playType}
                 onFocus={() => setFocusedField(1)}
                 onBlur={() => setFocusedField(null)}
                 onKeyDown={handleKeyDown}
@@ -116,6 +175,7 @@ export default function Registration() {
           <div className={`pilot-card ${focusedField === 2 ? 'focused' : ''} ${player2.trim() ? 'filled' : ''}`}>
             <div className="pilot-card-header">
               <div className="pilot-avatar magenta-avatar">
+                <MatrixRain active={focusedField === 2 || !!player2.trim()} color="#ff00e5" />
                 <span className="avatar-icon">{player2.trim() ? player2[0].toUpperCase() : '?'}</span>
                 <div className="avatar-ring" />
               </div>
@@ -134,6 +194,7 @@ export default function Registration() {
                 placeholder="ENTER CALLSIGN"
                 value={player2}
                 onChange={e => setPlayer2(e.target.value)}
+                onInput={playType}
                 onFocus={() => setFocusedField(2)}
                 onBlur={() => setFocusedField(null)}
                 onKeyDown={handleKeyDown}

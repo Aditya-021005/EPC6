@@ -6,11 +6,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://13.60.94.157:8005',
         changeOrigin: true,
       },
       '/images': {
-        target: 'http://localhost:8000',
+        target: 'http://13.60.94.157:8005',
         changeOrigin: true,
         rewrite: (path) => `/static${path}`,
       },

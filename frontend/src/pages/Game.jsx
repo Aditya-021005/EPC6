@@ -32,11 +32,18 @@ export default function Game() {
   const [countdown, setCountdown] = useState(null);
   const [shake, setShake] = useState(null);
 
+  // Stats tracking
+  const [correctCounts, setCorrectCounts] = useState({ 1: 0, 2: 0 });
+  const [wrongCounts, setWrongCounts] = useState({ 1: 0, 2: 0 });
+  const [maxCombo, setMaxCombo] = useState({ 1: 0, 2: 0 });
+  const [streakMilestone, setStreakMilestone] = useState(null);
+
   // Power-up state
   const [powerUps, setPowerUps] = useState({
-    1: { timeWarp: false, neuralHack: false, shield: false },
-    2: { timeWarp: false, neuralHack: false, shield: false },
+    1: { timeWarp: false, neuralHack: false, shield: false, sabotage: false },
+    2: { timeWarp: false, neuralHack: false, shield: false, sabotage: false },
   });
+  const [speedBonus, setSpeedBonus] = useState(null);
   const [shieldActive, setShieldActive] = useState(false);
   const [hackRevealed, setHackRevealed] = useState(false);
   const [powerUpFlash, setPowerUpFlash] = useState(null);
@@ -50,9 +57,11 @@ export default function Game() {
   const { play: playTickTock, stop: stopTickTock } = useSound('/sounds/tick-tock-31883.mp3', { loop: true });
   const { play: playCountdown } = useSound('/sounds/countdown.mp3');
   const { play: playGo } = useSound('/sounds/go.mp3');
+  const { play: playAmbient, stop: stopAmbient } = useSound('/sounds/ambient.mp3', { volume: 0.5, loop: true });
 
   // Refs
   const intervalRef = useRef(null);
+  const questionStartTimeRef = useRef(Date.now());
   const stateRef = useRef({
     currentUser: 1,
     isPaused: false,
@@ -63,9 +72,12 @@ export default function Game() {
     questions: [],
     currentIndex: 0,
     combo: 0,
+    correctCounts: { 1: 0, 2: 0 },
+    wrongCounts: { 1: 0, 2: 0 },
+    maxCombo: { 1: 0, 2: 0 },
     powerUps: {
-      1: { timeWarp: false, neuralHack: false, shield: false },
-      2: { timeWarp: false, neuralHack: false, shield: false },
+      1: { timeWarp: false, neuralHack: false, shield: false, sabotage: false },
+      2: { timeWarp: false, neuralHack: false, shield: false, sabotage: false },
     },
     shieldActive: false,
   });
@@ -76,8 +88,9 @@ export default function Game() {
       currentUser, isPaused, isAnswerShown, gameOver,
       timers, scores, questions, currentIndex, combo,
       powerUps, shieldActive,
+      correctCounts, wrongCounts, maxCombo,
     };
-  }, [currentUser, isPaused, isAnswerShown, gameOver, timers, scores, questions, currentIndex, combo, powerUps, shieldActive]);
+  }, [currentUser, isPaused, isAnswerShown, gameOver, timers, scores, questions, currentIndex, combo, powerUps, shieldActive, correctCounts, wrongCounts, maxCombo]);
 
   // Initialize audio removal/cleanup
   useEffect(() => {
@@ -92,10 +105,11 @@ export default function Game() {
 
     return () => {
       stopTickTock();
+      stopAmbient();
       clearInterval(intervalRef.current);
       clearInterval(glitchInterval);
     };
-  }, [stopTickTock]);
+  }, [stopTickTock, stopAmbient]);
 
   // Fetch questions
   useEffect(() => {
@@ -190,6 +204,7 @@ export default function Game() {
             setGameStarted(true);
             startTimer();
             playGo(); // Final "GO" sound
+            playAmbient();
             return 0;
           }
           playCountdown(); // Sounds for 3, 2, 1
@@ -197,7 +212,7 @@ export default function Game() {
         });
       }, 1000);
     }
-  }, [loading, showBriefing, dataLoaded, questions, gameStarted, startTimer, countdown]);
+  }, [loading, showBriefing, dataLoaded, questions, gameStarted, startTimer, countdown, playAmbient, playCountdown, playGo]);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -220,6 +235,7 @@ export default function Game() {
     setIsAnswerShown(false);
     setAnswerResult(null);
     setHackRevealed(false);
+    questionStartTimeRef.current = Date.now();
     startTimer();
   }, [startTimer]);
 
@@ -260,9 +276,37 @@ export default function Game() {
     setShake('correct');
     setTimeout(() => setShake(null), 600);
     setCombo(newCombo);
+
+    // Track stats
+    setCorrectCounts(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] + 1 }));
+    setMaxCombo(prev => ({
+      ...prev,
+      [s.currentUser]: Math.max(prev[s.currentUser], newCombo)
+    }));
+
+    // Streak milestones
+    if (newCombo === 3) {
+      setStreakMilestone('🔥 ON FIRE!');
+      setTimeout(() => setStreakMilestone(null), 1500);
+    } else if (newCombo === 5) {
+      setStreakMilestone('⚡ UNSTOPPABLE!');
+      setTimeout(() => setStreakMilestone(null), 1500);
+    } else if (newCombo === 7) {
+      setStreakMilestone('💀 GODLIKE!');
+      setTimeout(() => setStreakMilestone(null), 1500);
+    }
+
+    // Speed bonus: +5 if answered within 3 seconds
+    const elapsed = (Date.now() - questionStartTimeRef.current) / 1000;
+    const speedPts = elapsed <= 3 ? 5 : 0;
+    if (speedPts > 0) {
+      setSpeedBonus('⚡ QUICK DRAW +5');
+      setTimeout(() => setSpeedBonus(null), 1200);
+    }
+
     setScores(prev => ({
       ...prev,
-      [s.currentUser]: prev[s.currentUser] + (10 * multiplier)
+      [s.currentUser]: prev[s.currentUser] + (10 * multiplier) + speedPts
     }));
 
     setTimers(prev => ({
@@ -281,6 +325,9 @@ export default function Game() {
     setShake('wrong');
     setTimeout(() => setShake(null), 600);
     setCombo(0);
+
+    // Track stats
+    setWrongCounts(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] + 1 }));
 
     // Shield blocks the penalty
     if (s.shieldActive) {
@@ -358,6 +405,23 @@ export default function Game() {
     setTimeout(() => setPowerUpFlash(null), 800);
   }, []);
 
+  const activateSabotage = useCallback(() => {
+    const s = stateRef.current;
+    if (s.isAnswerShown || s.gameOver || s.isPaused) return;
+    if (s.powerUps[s.currentUser].sabotage) return;
+    const opponent = s.currentUser === 1 ? 2 : 1;
+    setPowerUps(prev => ({
+      ...prev,
+      [s.currentUser]: { ...prev[s.currentUser], sabotage: true }
+    }));
+    setTimers(prev => ({
+      ...prev,
+      [opponent]: Math.max(0, prev[opponent] - 5)
+    }));
+    setPowerUpFlash('sabotage');
+    setTimeout(() => setPowerUpFlash(null), 800);
+  }, []);
+
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -370,10 +434,34 @@ export default function Game() {
       else if (e.key === '1') activateTimeWarp();
       else if (e.key === '2') activateNeuralHack();
       else if (e.key === '3') activateShield();
+      else if (e.key === '4') activateSabotage();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [wrongAnswer, correctAnswer, togglePause, activateTimeWarp, activateNeuralHack, activateShield]);
+  }, [wrongAnswer, correctAnswer, togglePause, activateTimeWarp, activateNeuralHack, activateShield, activateSabotage]);
+
+  // Navigate to GameOver page with full stats
+  useEffect(() => {
+    if (gameOver) {
+      const s = stateRef.current;
+      stopAmbient();
+      navigate('/gameover', {
+        state: {
+          player1,
+          player2,
+          scores: s.scores,
+          correctCounts: s.correctCounts,
+          wrongCounts: s.wrongCounts,
+          maxCombo: s.maxCombo,
+          timers: s.timers,
+          totalQuestions: s.questions.length,
+          category: quizMeta?.category,
+          subcategory: quizMeta?.subcategory,
+        },
+        replace: true
+      });
+    }
+  }, [gameOver]);
 
   if (loading || !dataLoaded) {
     return <LoadingScreen onComplete={() => { setLoading(false); setShowBriefing(true); }} />;
@@ -434,6 +522,7 @@ export default function Game() {
                   <div className="briefing-key-row"><span className="briefing-key">1</span> Time Warp (+15s)</div>
                   <div className="briefing-key-row"><span className="briefing-key">2</span> Neural Hack (Reveal)</div>
                   <div className="briefing-key-row"><span className="briefing-key">3</span> Shield (Block Penalty)</div>
+                  <div className="briefing-key-row"><span className="briefing-key">4</span> Sabotage (−5s Enemy)</div>
                 </div>
               </div>
             </div>
@@ -458,51 +547,6 @@ export default function Game() {
             <span className="briefing-start-icon">▶</span>
             BEGIN MISSION
           </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (gameOver) {
-    return (
-      <div className="page-wrapper dashboard-wrapper">
-        <div className="glass-container winner-container" style={{ maxWidth: 600 }}>
-          <h1 className="title-glow">MATCH <span>TERMINATED</span></h1>
-          <div className="side-panels" style={{ marginBottom: 30 }}>
-            <div className="glass-panel hall-of-fame">
-              <h3 className="panel-title-sm">OPERATIONS <span>WINNER</span></h3>
-              <div className="mvp-highlight">
-                <div className="mvp-avatar">🥇</div>
-                <div className="mvp-name">
-                  {scores[1] > scores[2] ? player1 : scores[2] > scores[1] ? player2 : 'DRAW'}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="scores-box" style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 40,
-            fontSize: '18px',
-            fontFamily: 'var(--font-display)',
-            marginBottom: 40
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ opacity: 0.5, fontSize: '12px' }}>{player1}</div>
-              <div style={{ color: 'var(--cyan)', fontSize: '32px', fontWeight: 900 }}>{scores[1]}</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ opacity: 0.5, fontSize: '12px' }}>{player2}</div>
-              <div style={{ color: 'var(--magenta)', fontSize: '32px', fontWeight: 900 }}>{scores[2]}</div>
-            </div>
-          </div>
-          <div className="button-row">
-            <button className="btn-primary-glitch" onClick={() => navigate('/')}>
-              <span className="btn-text">RE-ENTER</span>
-              <span className="btn-glitch-effect"></span>
-            </button>
-            <button className="btn-text-only" onClick={() => navigate('/leaderboard')}>ALL RESULTS</button>
-          </div>
         </div>
       </div>
     );
@@ -625,6 +669,16 @@ export default function Game() {
                 <span className="powerup-name">SHIELD</span>
                 <span className="powerup-key">3</span>
               </button>
+              <button
+                className={`powerup-btn sabotage ${powerUps[1].sabotage ? 'used' : ''}`}
+                onClick={currentUser === 1 ? activateSabotage : undefined}
+                disabled={powerUps[1].sabotage || currentUser !== 1}
+                title="Sabotage (−5s Enemy)"
+              >
+                <span className="powerup-icon">💣</span>
+                <span className="powerup-name">SABOTAGE</span>
+                <span className="powerup-key">4</span>
+              </button>
             </div>
           </div>
         </div>
@@ -642,8 +696,22 @@ export default function Game() {
 
             <div className="target-aim-overlay"></div>
             <div className={`combo-display ${combo >= 3 ? 'show' : ''}`}>
-              COMBO x{combo >= 5 ? '3' : '2'}
+              🔥 COMBO x{combo >= 5 ? '3' : '2'}
             </div>
+
+            {/* Streak Milestone Banner */}
+            {streakMilestone && (
+              <div className="streak-milestone-banner" key={streakMilestone}>
+                <span className="streak-milestone-text">{streakMilestone}</span>
+              </div>
+            )}
+
+            {/* Speed Bonus Flash */}
+            {speedBonus && (
+              <div className="speed-bonus-flash" key={speedBonus + Date.now()}>
+                <span className="speed-bonus-text">{speedBonus}</span>
+              </div>
+            )}
 
             <div className="scanning-overlay"></div>
             <div className="scanning-line"></div>
@@ -786,6 +854,16 @@ export default function Game() {
                 <span className="powerup-icon">🛡️</span>
                 <span className="powerup-name">SHIELD</span>
                 <span className="powerup-key">3</span>
+              </button>
+              <button
+                className={`powerup-btn sabotage ${powerUps[2].sabotage ? 'used' : ''}`}
+                onClick={currentUser === 2 ? activateSabotage : undefined}
+                disabled={powerUps[2].sabotage || currentUser !== 2}
+                title="Sabotage (−5s Enemy)"
+              >
+                <span className="powerup-icon">💣</span>
+                <span className="powerup-name">SABOTAGE</span>
+                <span className="powerup-key">4</span>
               </button>
             </div>
           </div>

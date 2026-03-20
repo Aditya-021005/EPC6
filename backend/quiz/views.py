@@ -33,7 +33,18 @@ def get_subcategories(request, category_slug):
 @api_view(['GET'])
 def get_quiz(request, quiz_id):
     subcategory = get_object_or_404(Subcategory, quiz_id=quiz_id)
-    questions = subcategory.questions.all()
+    # Randomize question order each time
+    questions = subcategory.questions.order_by('?')
+
+    # Optional ?count=N to limit number of questions
+    count = request.query_params.get('count')
+    if count:
+        try:
+            count = int(count)
+            questions = questions[:count]
+        except (ValueError, TypeError):
+            pass
+
     q_serializer = QuestionSerializer(questions, many=True)
     
     # Transform QuestionSerializer output to match Express format if needed (image vs image_name)
