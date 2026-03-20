@@ -12,7 +12,6 @@ from .serializers import CategorySerializer, SubcategorySerializer, QuestionSeri
 logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
-@cache_page(60 * 15)
 def get_categories(request):
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)

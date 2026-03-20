@@ -251,7 +251,9 @@ export default function Game() {
 
     // Show answer result for 2s, then cinematic transition for 1.5s
     setTimeout(() => {
-      switchUser();
+      if (isCorrect) {
+        switchUser();
+      }
       // Check if this is the last question
       if (s.currentIndex + 1 >= s.questions.length) {
         nextQuestion();
