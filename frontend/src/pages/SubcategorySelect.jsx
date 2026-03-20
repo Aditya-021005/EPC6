@@ -12,7 +12,7 @@ export default function SubcategorySelect() {
   const { play: playHover } = useSound('/sounds/hover.mp3', { volume: 0.4 });
 
   useEffect(() => {
-    fetch(`/api/categories/${categorySlug}/subcategories`)
+    fetch(`/api/categories/${categorySlug}/subcategories`, { cache: 'no-store' })
       .then(res => res.json())
       .then(d => setData(d))
       .catch(err => console.error('Failed to load subcategories:', err));

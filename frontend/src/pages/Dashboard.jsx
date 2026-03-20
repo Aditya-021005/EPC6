@@ -14,7 +14,7 @@ export default function Dashboard() {
   const { play: playHover } = useSound('/sounds/hover.mp3', { volume: 0.4 });
 
   useEffect(() => {
-    fetch('/api/dashboard-data')
+    fetch('/api/dashboard-data', { cache: 'no-store' })
       .then(res => res.json())
       .then(dashboardData => {
         setData(dashboardData);

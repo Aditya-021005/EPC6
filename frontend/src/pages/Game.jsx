@@ -113,7 +113,7 @@ export default function Game() {
 
   // Fetch questions
   useEffect(() => {
-    fetch(`/api/quiz/${quizId}`)
+    fetch(`/api/quiz/${quizId}`, { cache: 'no-store' })
       .then(res => {
         if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
         return res.json();

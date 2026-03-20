@@ -4,7 +4,7 @@ import useSound from '../hooks/useSound';
 import './Leaderboard.css';
 
 const INITIAL_SHOW = 5;
-const LOAD_MORE    = 5;
+const LOAD_MORE = 5;
 
 /* ── Animated score counter ── */
 function CountUp({ target, duration = 1100, delay = 0 }) {
@@ -14,7 +14,7 @@ function CountUp({ target, duration = 1100, delay = 0 }) {
       let start = null;
       const step = ts => {
         if (!start) start = ts;
-        const p    = Math.min((ts - start) / duration, 1);
+        const p = Math.min((ts - start) / duration, 1);
         const ease = 1 - Math.pow(1 - p, 4);
         setVal(Math.round(ease * target));
         if (p < 1) requestAnimationFrame(step);
@@ -26,23 +26,23 @@ function CountUp({ target, duration = 1100, delay = 0 }) {
   return <>{val}</>;
 }
 
-const TIERS      = ['gold', 'cyan', 'magenta'];
-const MEDALS     = ['🥇', '🥈', '🥉'];
+const TIERS = ['gold', 'cyan', 'magenta'];
+const MEDALS = ['🥇', '🥈', '🥉'];
 const RANK_LABEL = ['CHAMPION', 'RUNNER·UP', '#3'];
 
 export default function Leaderboard() {
-  const [entries,      setEntries]      = useState([]);
-  const [loading,      setLoading]      = useState(true);
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(INITIAL_SHOW);
-  const [activeRow,    setActiveRow]    = useState(0);
-  const [revealed,     setRevealed]     = useState(false);
+  const [activeRow, setActiveRow] = useState(0);
+  const [revealed, setRevealed] = useState(false);
   const navigate = useNavigate();
 
   const { play: playClick } = useSound('/sounds/click.mp3', { volume: 0.6 });
   const { play: playHover } = useSound('/sounds/hover.mp3', { volume: 0.4 });
 
   useEffect(() => {
-    fetch('/api/leaderboard')
+    fetch('/api/leaderboard', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => { setEntries(data); setLoading(false); setTimeout(() => setRevealed(true), 60); })
       .catch(() => { setLoading(false); setRevealed(true); });
@@ -56,16 +56,16 @@ export default function Leaderboard() {
   }, [entries.length, visibleCount]);
 
   const getResult = r => {
-    if (r === 'win')  return { label: 'VICTORY', cls: 'hf-win' };
-    if (r === 'loss') return { label: 'DEFEAT',  cls: 'hf-loss' };
-    return                  { label: 'DRAW',     cls: 'hf-tie' };
+    if (r === 'win') return { label: 'VICTORY', cls: 'hf-win' };
+    if (r === 'loss') return { label: 'DEFEAT', cls: 'hf-loss' };
+    return { label: 'DRAW', cls: 'hf-tie' };
   };
 
   const fmt = d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 
   const visible = entries.slice(0, visibleCount);
   const hasMore = visibleCount < entries.length;
-  const remain  = entries.length - visibleCount;
+  const remain = entries.length - visibleCount;
 
   return (
     <div className="page-wrapper">
@@ -118,9 +118,9 @@ export default function Leaderboard() {
           {loading && (
             <div className="hf-loading">
               <div className="hf-loading__rig">
-                <div className="hf-loading__ring" style={{ '--sz':'72px','--clr':'var(--hf-cyan)',   '--dur':'2s' }} />
-                <div className="hf-loading__ring" style={{ '--sz':'54px','--clr':'var(--hf-magenta)','--dur':'2.6s','--rev':'1' }} />
-                <div className="hf-loading__ring" style={{ '--sz':'38px','--clr':'var(--hf-gold)',   '--dur':'1.8s' }} />
+                <div className="hf-loading__ring" style={{ '--sz': '72px', '--clr': 'var(--hf-cyan)', '--dur': '2s' }} />
+                <div className="hf-loading__ring" style={{ '--sz': '54px', '--clr': 'var(--hf-magenta)', '--dur': '2.6s', '--rev': '1' }} />
+                <div className="hf-loading__ring" style={{ '--sz': '38px', '--clr': 'var(--hf-gold)', '--dur': '1.8s' }} />
                 <div className="hf-loading__core" />
               </div>
               <p className="hf-loading__label">SYNCING COMBAT DATA...</p>
@@ -143,7 +143,7 @@ export default function Leaderboard() {
             <div className="hf-podium">
               {visible.slice(0, 3).map((e, i) => {
                 const tier = TIERS[i];
-                const res  = getResult(e.result);
+                const res = getResult(e.result);
                 return (
                   <div key={e.id}
                     className={`hf-card hf-card--${tier}${revealed ? ' hf-card--in' : ''}`}
@@ -211,7 +211,7 @@ export default function Leaderboard() {
                 </div>
 
                 {visible.slice(3).map((e, idx) => {
-                  const i   = idx + 3;
+                  const i = idx + 3;
                   const res = getResult(e.result);
                   const lit = activeRow === idx;
                   return (

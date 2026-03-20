@@ -19,7 +19,7 @@ export default function CategorySelect() {
   const { play: playHover } = useSound('/sounds/hover.mp3', { volume: 0.4 });
 
   useEffect(() => {
-    fetch('/api/categories')
+    fetch('/api/categories', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => { setCategories(data); setLoading(false); })
       .catch(err => { console.error('Failed to load categories:', err); setLoading(false); });
