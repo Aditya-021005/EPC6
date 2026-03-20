@@ -23,7 +23,8 @@ class Subcategory(models.Model):
 
 class Question(models.Model):
     subcategory = models.ForeignKey(Subcategory, related_name='questions', on_delete=models.CASCADE)
-    image_name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='quiz_images/', null=True, blank=True)
+    image_name = models.CharField(max_length=255, null=True, blank=True)
     answer = models.CharField(max_length=255)
 
     def __str__(self):

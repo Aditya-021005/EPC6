@@ -18,9 +18,19 @@ class SubcategorySerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
+    image_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Question
         fields = ['image_name', 'answer']
+
+    def get_image_name(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return obj.image_name
 
 class MatchResultSerializer(serializers.ModelSerializer):
     class Meta:
