@@ -83,7 +83,7 @@ export default function CategorySelect() {
               >
                 <div className="sel-card-accent" />
                 <div className="sel-card-header">
-                  <span className="sel-sector-id">SEC-{cat.id.toString().padStart(2, '0')}</span>
+                  <span className="sel-sector-id">SEC-{((currentPage - 1) * ITEMS_PER_PAGE + idx + 1).toString().padStart(2, '0')}</span>
                   <span className="sel-card-status">● ACTIVE</span>
                 </div>
                 <div className="sel-card-name">{cat.name}</div>
