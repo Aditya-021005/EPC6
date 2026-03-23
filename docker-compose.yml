@@ -18,16 +18,10 @@ services:
     ports:
       - "8005:8005"
     command: >
-      sh -c "
-        mkdir -p /app/backend/db_data &&
+      sh -c "mkdir -p /app/backend/db_data &&
         python manage.py migrate --run-syncdb &&
         python manage.py collectstatic --noinput &&
-        gunicorn core.wsgi:application
-          --bind 0.0.0.0:8005
-          --workers 3
-          --access-logfile -
-          --error-logfile -
-      "
+        gunicorn core.wsgi:application --bind 0.0.0.0:8005 --workers 3 --access-logfile - --error-logfile -"
 
   nginx:
     image: nginx:alpine
