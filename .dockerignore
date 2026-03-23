@@ -1,0 +1,28 @@
+.git
+.github
+.gitignore
+.DS_Store
+.vscode
+.idea
+*.md
+netlify/
+netlify.toml
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+backend/venv/
+backend/.venv/
+backend/env/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Database (don't bake into image)
+backend/db.sqlite3
+backend/media/
+
+# Artifacts
+*.log

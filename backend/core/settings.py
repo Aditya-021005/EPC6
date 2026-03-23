@@ -28,7 +28,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7ggp@3r9%1xz^#3)oob+p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    'CSRF_TRUSTED_ORIGINS',
+    'http://localhost,http://127.0.0.1,http://13.60.94.157'
+).split(',')
 
 
 # Application definition
@@ -83,9 +88,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Use db_data volume in Docker, fallback to local db.sqlite3 for dev
+_db_path = os.environ.get('DB_PATH', str(BASE_DIR / 'db.sqlite3'))
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=f"sqlite:///{_db_path}",
         conn_max_age=600,
         conn_health_checks=True,
     )
