@@ -4,6 +4,14 @@ import './GameArena.css';
 import LoadingScreen from '../components/LoadingScreen';
 import useSound from '../hooks/useSound';
 
+// Power-up economy config
+const POWERUP_CONFIG = {
+  timeWarp: { unlockAt: 80, cost: 80, icon: '⏳', name: 'WARP', key: '1', title: 'Time Warp (+15s)' },
+  neuralHack: { unlockAt: 200, cost: 150, icon: '🧠', name: 'HACK', key: '2', title: 'Neural Hack (Reveal Answer)' },
+  shield: { unlockAt: 100, cost: 100, icon: '🛡️', name: 'SHIELD', key: '3', title: 'Shield (Block Penalty)' },
+  sabotage: { unlockAt: 150, cost: 120, icon: '💣', name: 'SABOTAGE', key: '4', title: 'Sabotage (−5s Enemy)' },
+};
+
 export default function Game() {
   const { quizId } = useParams();
   const navigate = useNavigate();
@@ -12,21 +20,28 @@ export default function Game() {
   const player1 = localStorage.getItem('player1') || 'Player 1';
   const player2 = localStorage.getItem('player2') || 'Player 2';
 
+  // Multi-round context
+  const roundCount = parseInt(localStorage.getItem('roundCount') || '3');
+  const currentRound = parseInt(localStorage.getItem('currentRound') || '1');
+
+  // Restore timers & scores from previous rounds (persisted in localStorage)
+  const savedTimers = (() => { try { return JSON.parse(localStorage.getItem('timers')); } catch { return null; } })();
+  const savedScores = (() => { try { return JSON.parse(localStorage.getItem('scores')); } catch { return null; } })();
+
   // Game state
   const [questions, setQuestions] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [gameOver, setGameOver] = useState(false);
+  const [roundOver, setRoundOver] = useState(false);
   const [quizMeta, setQuizMeta] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState(1);
-  const [timers, setTimers] = useState({ 1: 120, 2: 120 });
-  const [scores, setScores] = useState({ 1: 0, 2: 0 });
+  const [timers, setTimers] = useState(savedTimers || { 1: 120, 2: 120 });
+  const [scores, setScores] = useState(savedScores || { 1: 0, 2: 0 });
   const [isPaused, setIsPaused] = useState(false);
   const [isAnswerShown, setIsAnswerShown] = useState(false);
   const [answerResult, setAnswerResult] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
-  const [showBriefing, setShowBriefing] = useState(false);
   const [combo, setCombo] = useState(0);
   const [glitchActive, setGlitchActive] = useState(false);
   const [countdown, setCountdown] = useState(null);
@@ -38,11 +53,7 @@ export default function Game() {
   const [maxCombo, setMaxCombo] = useState({ 1: 0, 2: 0 });
   const [streakMilestone, setStreakMilestone] = useState(null);
 
-  // Power-up state
-  const [powerUps, setPowerUps] = useState({
-    1: { timeWarp: false, neuralHack: false, shield: false, sabotage: false },
-    2: { timeWarp: false, neuralHack: false, shield: false, sabotage: false },
-  });
+  // Power-ups are now reusable — no "used" tracking
   const [speedBonus, setSpeedBonus] = useState(null);
   const [shieldActive, setShieldActive] = useState(false);
   const [hackRevealed, setHackRevealed] = useState(false);
@@ -66,31 +77,27 @@ export default function Game() {
     currentUser: 1,
     isPaused: false,
     isAnswerShown: false,
-    gameOver: false,
-    timers: { 1: 120, 2: 120 },
-    scores: { 1: 0, 2: 0 },
+    roundOver: false,
+    timers: savedTimers || { 1: 120, 2: 120 },
+    scores: savedScores || { 1: 0, 2: 0 },
     questions: [],
     currentIndex: 0,
     combo: 0,
     correctCounts: { 1: 0, 2: 0 },
     wrongCounts: { 1: 0, 2: 0 },
     maxCombo: { 1: 0, 2: 0 },
-    powerUps: {
-      1: { timeWarp: false, neuralHack: false, shield: false, sabotage: false },
-      2: { timeWarp: false, neuralHack: false, shield: false, sabotage: false },
-    },
     shieldActive: false,
   });
 
   // Keep ref in sync
   useEffect(() => {
     stateRef.current = {
-      currentUser, isPaused, isAnswerShown, gameOver,
+      currentUser, isPaused, isAnswerShown, roundOver,
       timers, scores, questions, currentIndex, combo,
-      powerUps, shieldActive,
+      shieldActive,
       correctCounts, wrongCounts, maxCombo,
     };
-  }, [currentUser, isPaused, isAnswerShown, gameOver, timers, scores, questions, currentIndex, combo, powerUps, shieldActive, correctCounts, wrongCounts, maxCombo]);
+  }, [currentUser, isPaused, isAnswerShown, roundOver, timers, scores, questions, currentIndex, combo, shieldActive, correctCounts, wrongCounts, maxCombo]);
 
   // Initialize audio removal/cleanup
   useEffect(() => {
@@ -140,26 +147,80 @@ export default function Game() {
     return () => clearTimeout(timer);
   }, [loading, dataLoaded, questions]);
 
-  // Save scores to leaderboard when game ends
-  const scoresSavedRef = useRef(false);
+  // Handle round end — persist state and navigate
+  const roundHandledRef = useRef(false);
   useEffect(() => {
-    if (gameOver && !scoresSavedRef.current) {
-      scoresSavedRef.current = true;
+    if (!roundOver || roundHandledRef.current) return;
+    roundHandledRef.current = true;
+    stopAmbient();
+    stopTickTock();
+    clearInterval(intervalRef.current);
+
+    const s = stateRef.current;
+    const roundCategory = localStorage.getItem('roundCategory') || quizMeta?.category || '';
+    const roundSubcategory = localStorage.getItem('roundSubcategory') || quizMeta?.subcategory || '';
+
+    // Calculate who won this round (by score gained THIS round)
+    const prevScores = savedScores || { 1: 0, 2: 0 };
+    const roundScore1 = s.scores[1] - prevScores[1];
+    const roundScore2 = s.scores[2] - prevScores[2];
+    const roundWinner = roundScore1 >= roundScore2 ? 1 : 2;
+
+    // Save cumulative state
+    localStorage.setItem('timers', JSON.stringify(s.timers));
+    localStorage.setItem('scores', JSON.stringify(s.scores));
+
+    // Append round result
+    const roundScores = JSON.parse(localStorage.getItem('roundScores') || '[]');
+    roundScores.push({
+      round: currentRound,
+      category: roundCategory,
+      subcategory: roundSubcategory,
+      score1: roundScore1,
+      score2: roundScore2,
+      winner: roundWinner,
+    });
+    localStorage.setItem('roundScores', JSON.stringify(roundScores));
+
+    if (currentRound < roundCount) {
+      // More rounds: winner picks next category
+      localStorage.setItem('currentRound', (currentRound + 1).toString());
+      localStorage.setItem('roundPicker', roundWinner.toString());
+      navigate('/round-select', { replace: true });
+    } else {
+      // Final round — save to leaderboard and go to GameOver
       fetch('/api/leaderboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           player1,
           player2,
-          score1: scores[1],
-          score2: scores[2],
-          category: quizMeta.category,
-          subcategory: quizMeta.subcategory,
+          score1: s.scores[1],
+          score2: s.scores[2],
+          category: roundCategory,
+          subcategory: roundSubcategory,
           quizId,
         }),
       }).catch(err => console.error('Failed to save scores:', err));
+
+      navigate('/gameover', {
+        state: {
+          player1,
+          player2,
+          scores: s.scores,
+          correctCounts: s.correctCounts,
+          wrongCounts: s.wrongCounts,
+          maxCombo: s.maxCombo,
+          timers: s.timers,
+          totalQuestions: s.questions.length,
+          category: roundCategory,
+          subcategory: roundSubcategory,
+          roundScores,
+        },
+        replace: true
+      });
     }
-  }, [gameOver, player1, player2, scores, quizMeta, quizId]);
+  }, [roundOver]);
 
   // Start timer
   const startTimer = useCallback(() => {
@@ -170,7 +231,7 @@ export default function Game() {
 
     intervalRef.current = setInterval(() => {
       const s = stateRef.current;
-      if (s.isPaused || s.isAnswerShown || s.gameOver) return;
+      if (s.isPaused || s.isAnswerShown || s.roundOver) return;
 
       setTimers(prev => {
         const user = s.currentUser;
@@ -184,7 +245,7 @@ export default function Game() {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
           stopTickTock();
-          setTimeout(() => setGameOver(true), 0);
+          setTimeout(() => setRoundOver(true), 0);
           return { ...prev, [user]: 0 };
         }
 
@@ -193,9 +254,9 @@ export default function Game() {
     }, 1000);
   }, []);
 
-  // Start game with Countdown
+  // Start game with Countdown (no briefing — handled by RoundSelect)
   useEffect(() => {
-    if (!loading && !showBriefing && dataLoaded && questions.length > 0 && !gameStarted && countdown === null) {
+    if (!loading && dataLoaded && questions.length > 0 && !gameStarted && countdown === null) {
       setCountdown(4);
       const cdInterval = setInterval(() => {
         setCountdown(prev => {
@@ -203,16 +264,16 @@ export default function Game() {
             clearInterval(cdInterval);
             setGameStarted(true);
             startTimer();
-            playGo(); // Final "GO" sound
+            playGo();
             playAmbient();
             return 0;
           }
-          playCountdown(); // Sounds for 3, 2, 1
+          playCountdown();
           return prev - 1;
         });
       }, 1000);
     }
-  }, [loading, showBriefing, dataLoaded, questions, gameStarted, startTimer, countdown, playAmbient, playCountdown, playGo]);
+  }, [loading, dataLoaded, questions, gameStarted, startTimer, countdown, playAmbient, playCountdown, playGo]);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -228,7 +289,7 @@ export default function Game() {
   const nextQuestion = useCallback(() => {
     const s = stateRef.current;
     if (s.currentIndex + 1 >= s.questions.length) {
-      setGameOver(true);
+      setRoundOver(true);
       return;
     }
     setCurrentIndex(prev => prev + 1);
@@ -363,31 +424,34 @@ export default function Game() {
     });
   }, [stopTickTock, playTickTock]);
 
-  // Power-up activation functions
+  // Power-up helpers
+  const canAfford = (player, powerUpKey) => {
+    const cfg = POWERUP_CONFIG[powerUpKey];
+    return scores[player] >= cfg.unlockAt && scores[player] >= cfg.cost;
+  };
+
+  const isUnlocked = (player, powerUpKey) => {
+    return scores[player] >= POWERUP_CONFIG[powerUpKey].unlockAt;
+  };
+
+  // Power-up activation functions (reusable, cost points)
   const activateTimeWarp = useCallback(() => {
     const s = stateRef.current;
-    if (s.isAnswerShown || s.gameOver || s.isPaused) return;
-    if (s.powerUps[s.currentUser].timeWarp) return; // already used
-    setPowerUps(prev => ({
-      ...prev,
-      [s.currentUser]: { ...prev[s.currentUser], timeWarp: true }
-    }));
-    setTimers(prev => ({
-      ...prev,
-      [s.currentUser]: prev[s.currentUser] + 15
-    }));
+    if (s.isAnswerShown || s.roundOver || s.isPaused) return;
+    const cfg = POWERUP_CONFIG.timeWarp;
+    if (s.scores[s.currentUser] < cfg.unlockAt || s.scores[s.currentUser] < cfg.cost) return;
+    setScores(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] - cfg.cost }));
+    setTimers(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] + 15 }));
     setPowerUpFlash('timeWarp');
     setTimeout(() => setPowerUpFlash(null), 800);
   }, []);
 
   const activateNeuralHack = useCallback(() => {
     const s = stateRef.current;
-    if (s.isAnswerShown || s.gameOver || s.isPaused) return;
-    if (s.powerUps[s.currentUser].neuralHack) return;
-    setPowerUps(prev => ({
-      ...prev,
-      [s.currentUser]: { ...prev[s.currentUser], neuralHack: true }
-    }));
+    if (s.isAnswerShown || s.roundOver || s.isPaused) return;
+    const cfg = POWERUP_CONFIG.neuralHack;
+    if (s.scores[s.currentUser] < cfg.unlockAt || s.scores[s.currentUser] < cfg.cost) return;
+    setScores(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] - cfg.cost }));
     setHackRevealed(true);
     setPowerUpFlash('neuralHack');
     setTimeout(() => setPowerUpFlash(null), 800);
@@ -396,12 +460,10 @@ export default function Game() {
 
   const activateShield = useCallback(() => {
     const s = stateRef.current;
-    if (s.isAnswerShown || s.gameOver || s.isPaused) return;
-    if (s.powerUps[s.currentUser].shield) return;
-    setPowerUps(prev => ({
-      ...prev,
-      [s.currentUser]: { ...prev[s.currentUser], shield: true }
-    }));
+    if (s.isAnswerShown || s.roundOver || s.isPaused) return;
+    const cfg = POWERUP_CONFIG.shield;
+    if (s.scores[s.currentUser] < cfg.unlockAt || s.scores[s.currentUser] < cfg.cost) return;
+    setScores(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] - cfg.cost }));
     setShieldActive(true);
     setPowerUpFlash('shield');
     setTimeout(() => setPowerUpFlash(null), 800);
@@ -409,17 +471,12 @@ export default function Game() {
 
   const activateSabotage = useCallback(() => {
     const s = stateRef.current;
-    if (s.isAnswerShown || s.gameOver || s.isPaused) return;
-    if (s.powerUps[s.currentUser].sabotage) return;
+    if (s.isAnswerShown || s.roundOver || s.isPaused) return;
+    const cfg = POWERUP_CONFIG.sabotage;
+    if (s.scores[s.currentUser] < cfg.unlockAt || s.scores[s.currentUser] < cfg.cost) return;
     const opponent = s.currentUser === 1 ? 2 : 1;
-    setPowerUps(prev => ({
-      ...prev,
-      [s.currentUser]: { ...prev[s.currentUser], sabotage: true }
-    }));
-    setTimers(prev => ({
-      ...prev,
-      [opponent]: Math.max(0, prev[opponent] - 5)
-    }));
+    setScores(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] - cfg.cost }));
+    setTimers(prev => ({ ...prev, [opponent]: Math.max(0, prev[opponent] - 5) }));
     setPowerUpFlash('sabotage');
     setTimeout(() => setPowerUpFlash(null), 800);
   }, []);
@@ -442,117 +499,32 @@ export default function Game() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [wrongAnswer, correctAnswer, togglePause, activateTimeWarp, activateNeuralHack, activateShield, activateSabotage]);
 
-  // Navigate to GameOver page with full stats
-  useEffect(() => {
-    if (gameOver) {
-      const s = stateRef.current;
-      stopAmbient();
-      navigate('/gameover', {
-        state: {
-          player1,
-          player2,
-          scores: s.scores,
-          correctCounts: s.correctCounts,
-          wrongCounts: s.wrongCounts,
-          maxCombo: s.maxCombo,
-          timers: s.timers,
-          totalQuestions: s.questions.length,
-          category: quizMeta?.category,
-          subcategory: quizMeta?.subcategory,
-        },
-        replace: true
-      });
-    }
-  }, [gameOver]);
+  // (round-end navigation is handled by the roundOver useEffect above)
 
   if (loading || !dataLoaded) {
-    return <LoadingScreen onComplete={() => { setLoading(false); setShowBriefing(true); }} />;
+    return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  if (showBriefing) {
+  // Helper to render a power-up button for a given player
+  const renderPowerUpBtn = (playerNum, key, activateFn) => {
+    const cfg = POWERUP_CONFIG[key];
+    const unlocked = isUnlocked(playerNum, key);
+    const affordable = canAfford(playerNum, key);
+    const isActive = currentUser === playerNum;
     return (
-      <div className="page-wrapper">
-        <div className="briefing-container">
-          <div className="briefing-badge">
-            <span className="briefing-badge-dot" />
-            <span>MISSION BRIEFING</span>
-          </div>
-          <h1 className="briefing-title">COMBAT <span>PROTOCOL</span></h1>
-          <p className="briefing-subtitle">{quizMeta?.category?.toUpperCase()} — {quizMeta?.subcategory?.toUpperCase()}</p>
-
-          <div className="briefing-grid">
-            <div className="briefing-card">
-              <div className="briefing-card-accent cyan-accent" />
-              <div className="briefing-card-icon">⚡</div>
-              <div className="briefing-card-title">OBJECTIVE</div>
-              <div className="briefing-card-text">
-                An image is shown. Identify it correctly to score points. Each player takes turns.
-                Your timer counts down — when it hits zero, you're out.
-              </div>
-            </div>
-
-            <div className="briefing-card">
-              <div className="briefing-card-accent magenta-accent" />
-              <div className="briefing-card-icon">🎮</div>
-              <div className="briefing-card-title">CONTROLS</div>
-              <div className="briefing-card-text">
-                <div className="briefing-keys">
-                  <div className="briefing-key-row"><span className="briefing-key">→</span> Correct / Identified</div>
-                  <div className="briefing-key-row"><span className="briefing-key">←</span> Wrong / No Match</div>
-                  <div className="briefing-key-row"><span className="briefing-key">SPACE</span> Pause Game</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="briefing-card">
-              <div className="briefing-card-accent gold-accent" />
-              <div className="briefing-card-icon">🏆</div>
-              <div className="briefing-card-title">SCORING</div>
-              <div className="briefing-card-text">
-                <strong>+10 pts</strong> per correct answer + <strong>5s</strong> bonus time.
-                Build combos for <strong>2x—3x</strong> multipliers.
-                Wrong answer: <strong>−5 pts</strong> and <strong>−5s</strong> penalty.
-              </div>
-            </div>
-
-            <div className="briefing-card">
-              <div className="briefing-card-accent cyan-accent" />
-              <div className="briefing-card-icon">🛡️</div>
-              <div className="briefing-card-title">POWER-UPS</div>
-              <div className="briefing-card-text">
-                <div className="briefing-keys">
-                  <div className="briefing-key-row"><span className="briefing-key">1</span> Time Warp (+15s)</div>
-                  <div className="briefing-key-row"><span className="briefing-key">2</span> Neural Hack (Reveal)</div>
-                  <div className="briefing-key-row"><span className="briefing-key">3</span> Shield (Block Penalty)</div>
-                  <div className="briefing-key-row"><span className="briefing-key">4</span> Sabotage (−5s Enemy)</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="briefing-pilots">
-            <div className="briefing-pilot cyan-pilot">
-              <span className="briefing-pilot-label">PILOT 1</span>
-              <span className="briefing-pilot-name">{player1}</span>
-            </div>
-            <span className="briefing-vs">VS</span>
-            <div className="briefing-pilot magenta-pilot">
-              <span className="briefing-pilot-label">PILOT 2</span>
-              <span className="briefing-pilot-name">{player2}</span>
-            </div>
-          </div>
-
-          <button
-            className="briefing-start-btn"
-            onClick={() => setShowBriefing(false)}
-          >
-            <span className="briefing-start-icon">▶</span>
-            BEGIN MISSION
-          </button>
-        </div>
-      </div>
+      <button
+        key={key}
+        className={`powerup-btn ${key} ${!unlocked ? 'locked' : ''} ${!affordable ? 'too-expensive' : ''}`}
+        onClick={isActive && affordable ? activateFn : undefined}
+        disabled={!isActive || !affordable}
+        title={unlocked ? `${cfg.title} (Cost: ${cfg.cost} pts)` : `Unlocks at ${cfg.unlockAt} pts`}
+      >
+        <span className="powerup-icon">{unlocked ? cfg.icon : '🔒'}</span>
+        <span className="powerup-name">{cfg.name}</span>
+        <span className="powerup-cost">{unlocked ? `${cfg.cost}p` : `${cfg.unlockAt}p`}</span>
+      </button>
     );
-  }
+  };
 
   const currentQuestion = questions[currentIndex];
   const imageUrl = `/images/${currentQuestion?.image}`;
@@ -641,46 +613,10 @@ export default function Game() {
           <div className="powerups-dock">
             <div className="powerups-label">TACTICAL SYSTEMS</div>
             <div className="powerups-grid">
-              <button
-                className={`powerup-btn timeWarp ${powerUps[1].timeWarp ? 'used' : ''}`}
-                onClick={currentUser === 1 ? activateTimeWarp : undefined}
-                disabled={powerUps[1].timeWarp || currentUser !== 1}
-                title="Time Warp (+15s)"
-              >
-                <span className="powerup-icon">⏳</span>
-                <span className="powerup-name">WARP</span>
-                <span className="powerup-key">1</span>
-              </button>
-              <button
-                className={`powerup-btn neuralHack ${powerUps[1].neuralHack ? 'used' : ''}`}
-                onClick={currentUser === 1 ? activateNeuralHack : undefined}
-                disabled={powerUps[1].neuralHack || currentUser !== 1}
-                title="Neural Hack (Reveal Answer)"
-              >
-                <span className="powerup-icon">🧠</span>
-                <span className="powerup-name">HACK</span>
-                <span className="powerup-key">2</span>
-              </button>
-              <button
-                className={`powerup-btn shield ${powerUps[1].shield ? 'used' : ''}`}
-                onClick={currentUser === 1 ? activateShield : undefined}
-                disabled={powerUps[1].shield || currentUser !== 1}
-                title="Shield (Block Penalty)"
-              >
-                <span className="powerup-icon">🛡️</span>
-                <span className="powerup-name">SHIELD</span>
-                <span className="powerup-key">3</span>
-              </button>
-              <button
-                className={`powerup-btn sabotage ${powerUps[1].sabotage ? 'used' : ''}`}
-                onClick={currentUser === 1 ? activateSabotage : undefined}
-                disabled={powerUps[1].sabotage || currentUser !== 1}
-                title="Sabotage (−5s Enemy)"
-              >
-                <span className="powerup-icon">💣</span>
-                <span className="powerup-name">SABOTAGE</span>
-                <span className="powerup-key">4</span>
-              </button>
+              {renderPowerUpBtn(1, 'timeWarp', activateTimeWarp)}
+              {renderPowerUpBtn(1, 'neuralHack', activateNeuralHack)}
+              {renderPowerUpBtn(1, 'shield', activateShield)}
+              {renderPowerUpBtn(1, 'sabotage', activateSabotage)}
             </div>
           </div>
         </div>
@@ -688,7 +624,7 @@ export default function Game() {
         {/* Central Arena */}
         <div className="combat-node">
           <div className="combat-data-bar">
-            <span>SECTOR: {quizMeta?.category?.toUpperCase()}</span>
+            <span>ROUND {currentRound}/{roundCount} — {quizMeta?.category?.toUpperCase()}</span>
             <span>TARGET: {currentIndex + 1} / {questions.length}</span>
             <span>OPS: ACTIVE</span>
           </div>
@@ -772,7 +708,7 @@ export default function Game() {
 
             <div className="hud-utility-btns">
               <button className="btn-hud" onClick={togglePause}>{isPaused ? 'RESUME' : 'PAUSE'}</button>
-              <button className="btn-hud" onClick={() => navigate('/categories')}>ABORT</button>
+              <button className="btn-hud" onClick={() => navigate('/')}>ABORT</button>
             </div>
 
             <div className="mobile-touch-controls">
@@ -827,46 +763,10 @@ export default function Game() {
           <div className="powerups-dock">
             <div className="powerups-label">TACTICAL SYSTEMS</div>
             <div className="powerups-grid">
-              <button
-                className={`powerup-btn timeWarp ${powerUps[2].timeWarp ? 'used' : ''}`}
-                onClick={currentUser === 2 ? activateTimeWarp : undefined}
-                disabled={powerUps[2].timeWarp || currentUser !== 2}
-                title="Time Warp (+15s)"
-              >
-                <span className="powerup-icon">⏳</span>
-                <span className="powerup-name">WARP</span>
-                <span className="powerup-key">1</span>
-              </button>
-              <button
-                className={`powerup-btn neuralHack ${powerUps[2].neuralHack ? 'used' : ''}`}
-                onClick={currentUser === 2 ? activateNeuralHack : undefined}
-                disabled={powerUps[2].neuralHack || currentUser !== 2}
-                title="Neural Hack (Reveal Answer)"
-              >
-                <span className="powerup-icon">🧠</span>
-                <span className="powerup-name">HACK</span>
-                <span className="powerup-key">2</span>
-              </button>
-              <button
-                className={`powerup-btn shield ${powerUps[2].shield ? 'used' : ''}`}
-                onClick={currentUser === 2 ? activateShield : undefined}
-                disabled={powerUps[2].shield || currentUser !== 2}
-                title="Shield (Block Penalty)"
-              >
-                <span className="powerup-icon">🛡️</span>
-                <span className="powerup-name">SHIELD</span>
-                <span className="powerup-key">3</span>
-              </button>
-              <button
-                className={`powerup-btn sabotage ${powerUps[2].sabotage ? 'used' : ''}`}
-                onClick={currentUser === 2 ? activateSabotage : undefined}
-                disabled={powerUps[2].sabotage || currentUser !== 2}
-                title="Sabotage (−5s Enemy)"
-              >
-                <span className="powerup-icon">💣</span>
-                <span className="powerup-name">SABOTAGE</span>
-                <span className="powerup-key">4</span>
-              </button>
+              {renderPowerUpBtn(2, 'timeWarp', activateTimeWarp)}
+              {renderPowerUpBtn(2, 'neuralHack', activateNeuralHack)}
+              {renderPowerUpBtn(2, 'shield', activateShield)}
+              {renderPowerUpBtn(2, 'sabotage', activateSabotage)}
             </div>
           </div>
         </div>

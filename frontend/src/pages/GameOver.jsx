@@ -96,8 +96,14 @@ export default function GameOver() {
     player1, player2, scores,
     correctCounts, wrongCounts, maxCombo,
     timers, totalQuestions,
-    category, subcategory
+    category, subcategory,
+    roundScores
   } = location.state || {};
+
+  // Clear round state from localStorage
+  useEffect(() => {
+    ['roundCount', 'currentRound', 'timers', 'scores', 'roundScores', 'roundPicker', 'roundCategory', 'roundSubcategory'].forEach(k => localStorage.removeItem(k));
+  }, []);
 
   const { play: playClick } = useSound('/sounds/click.mp3', { volume: 0.6 });
   const { play: playHover } = useSound('/sounds/hover.mp3', { volume: 0.4 });
@@ -270,11 +276,41 @@ export default function GameOver() {
           </div>
         )}
 
+        {/* Per-Round Breakdown */}
+        {roundScores && roundScores.length > 0 && (
+          <div className="go-stats-section">
+            <div className="go-stats-header">
+              <span className="go-stats-dot" />
+              <span>ROUND BREAKDOWN</span>
+            </div>
+            <div className="go-round-table">
+              <div className="go-round-row go-round-header-row">
+                <span>RND</span>
+                <span>SECTOR</span>
+                <span>{player1}</span>
+                <span>{player2}</span>
+                <span>WINNER</span>
+              </div>
+              {roundScores.map((r, i) => (
+                <div key={i} className="go-round-row">
+                  <span className="go-round-num">{r.round}</span>
+                  <span className="go-round-cat">{r.category}</span>
+                  <span className={`go-round-score ${r.winner === 1 ? 'winner-score' : ''}`}>{r.score1}</span>
+                  <span className={`go-round-score ${r.winner === 2 ? 'winner-score' : ''}`}>{r.score2}</span>
+                  <span className={`go-round-winner ${r.winner === 1 ? 'cyan-text' : 'magenta-text'}`}>
+                    {r.winner === 1 ? player1 : player2}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="go-actions">
           <button
             className="go-btn-primary"
-            onClick={() => { playClick(); navigate('/categories'); }}
+            onClick={() => { playClick(); navigate('/register'); }}
             onMouseEnter={playHover}
           >
             <span>⚔</span> BATTLE AGAIN

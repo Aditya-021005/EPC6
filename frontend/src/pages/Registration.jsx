@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useSound from '../hooks/useSound';
 import './Registration.css';
 
@@ -59,10 +59,12 @@ function MatrixRain({ active, color = '#00f0ff' }) {
   );
 }
 
+const ROUND_OPTIONS = [3, 4, 5];
+
 export default function Registration() {
-  const { quizId } = useParams();
   const [player1, setPlayer1] = useState('');
   const [player2, setPlayer2] = useState('');
+  const [roundCount, setRoundCount] = useState(3);
   const [focusedField, setFocusedField] = useState(null);
   const [fadeOut, setFadeOut] = useState(false);
   const navigate = useNavigate();
@@ -78,8 +80,14 @@ export default function Registration() {
     playClick();
     localStorage.setItem('player1', player1.trim());
     localStorage.setItem('player2', player2.trim());
+    localStorage.setItem('roundCount', roundCount.toString());
+    localStorage.setItem('currentRound', '1');
+    localStorage.setItem('timers', JSON.stringify({ 1: 120, 2: 120 }));
+    localStorage.setItem('scores', JSON.stringify({ 1: 0, 2: 0 }));
+    localStorage.setItem('roundScores', JSON.stringify([]));
+    localStorage.setItem('roundPicker', '1'); // P1 picks first round
     setFadeOut(true);
-    setTimeout(() => navigate(`/game/${quizId}`), 600);
+    setTimeout(() => navigate('/round-select'), 600);
   };
 
   const handleKeyDown = (e) => {
@@ -219,11 +227,29 @@ export default function Registration() {
           </div>
         </div>
 
+        {/* Round Count Selector */}
+        <div className="round-selector">
+          <div className="round-selector-label">COMBAT ROUNDS</div>
+          <div className="round-selector-options">
+            {ROUND_OPTIONS.map(n => (
+              <button
+                key={n}
+                className={`round-option ${roundCount === n ? 'active' : ''}`}
+                onClick={() => { playClick(); setRoundCount(n); }}
+                onMouseEnter={playHover}
+              >
+                <span className="round-option-number">{n}</span>
+                <span className="round-option-label">ROUNDS</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Action Bar */}
         <div className="reg-actions">
           <button
             className="reg-btn-abort"
-            onClick={() => { playClick(); navigate(-1); }}
+            onClick={() => { playClick(); navigate('/'); }}
             onMouseEnter={playHover}
           >
             <span className="abort-icon">←</span>

@@ -67,7 +67,7 @@ export default function Dashboard() {
         {/* Launch Button */}
         <button
           className="dash-launch-btn"
-          onClick={() => { playClick(); navigate('/categories'); }}
+          onClick={() => { playClick(); navigate('/register'); }}
           onMouseEnter={playHover}
         >
           <span className="dash-launch-icon">⚔</span>

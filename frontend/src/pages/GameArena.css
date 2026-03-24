@@ -1229,8 +1229,8 @@
 
 .powerups-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
 
 .powerup-btn {
@@ -1361,8 +1361,8 @@
   }
 }
 
-.powerup-btn.used {
-  opacity: 0.3;
+.powerup-btn.locked {
+  opacity: 0.25;
   cursor: not-allowed;
   border-color: rgba(255, 255, 255, 0.05) !important;
   background: rgba(255, 255, 255, 0.02) !important;
@@ -1370,22 +1370,16 @@
   transform: none !important;
 }
 
-.powerup-btn.used .powerup-icon {
+.powerup-btn.locked .powerup-icon {
   filter: grayscale(1);
 }
 
-.powerup-btn.used::after {
-  content: '✕';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
-  color: rgba(255, 51, 85, 0.5);
-  font-weight: 900;
+.powerup-btn.too-expensive:not(.locked) {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
-.powerup-btn:disabled:not(.used) {
+.powerup-btn:disabled:not(.locked) {
   opacity: 0.5;
   cursor: default;
 }
@@ -1403,7 +1397,7 @@
   font-weight: 700;
 }
 
-.powerup-key {
+.powerup-cost {
   font-family: var(--font-display);
   font-size: 8px;
   background: rgba(255, 255, 255, 0.08);
