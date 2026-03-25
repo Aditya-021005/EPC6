@@ -527,7 +527,10 @@ export default function Game() {
   };
 
   const currentQuestion = questions[currentIndex];
-  const imageUrl = `/images/${currentQuestion?.image}`;
+  const imagePath = currentQuestion?.image;
+  const imageUrl = imagePath?.startsWith('http') || imagePath?.startsWith('/media')
+    ? imagePath
+    : `/images/${imagePath}`;
 
   return (
     <div className={`page-wrapper ${shake ? 'arena-shake' : ''}`}>

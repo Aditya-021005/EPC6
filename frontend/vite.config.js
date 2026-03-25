@@ -14,6 +14,10 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => `/static${path}`,
       },
+      '/media': {
+        target: 'http://13.60.94.157:8005',
+        changeOrigin: true,
+      },
     },
   },
 })

@@ -44,7 +44,7 @@ def get_quiz(request, quiz_id):
         except (ValueError, TypeError):
             pass
 
-    q_serializer = QuestionSerializer(questions, many=True)
+    q_serializer = QuestionSerializer(questions, many=True, context={'request': request})
     
     # Transform QuestionSerializer output to match Express format if needed (image vs image_name)
     transformed_questions = []
