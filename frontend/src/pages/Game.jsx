@@ -275,6 +275,17 @@ export default function Game() {
     }
   }, [loading, dataLoaded, questions, gameStarted, startTimer, countdown, playAmbient, playCountdown, playGo]);
 
+  // Host Intel: Secretly log the target answer to the developer console
+  useEffect(() => {
+    if (questions.length > 0 && currentIndex < questions.length) {
+      console.log(
+        `%c[HOST INTEL] Target ${currentIndex + 1} Answer: %c${questions[currentIndex].answer}`,
+        'color: #00ffff; font-weight: bold; font-size: 14px;',
+        'color: #ffffff; background: #222222; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 14px;'
+      );
+    }
+  }, [currentIndex, questions]);
+
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
