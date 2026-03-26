@@ -9,6 +9,7 @@ import RoundSelect from './pages/RoundSelect';
 import Game from './pages/Game';
 import GameOver from './pages/GameOver';
 import Leaderboard from './pages/Leaderboard';
+import Instructions from './pages/Instructions';
 import AnimatedBackground from './components/AnimatedBackground';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/instructions" element={<Instructions />} />
           <Route path="/categories" element={<CategorySelect />} />
           <Route path="/categories/:categoryId" element={<SubcategorySelect />} />
           <Route path="/register" element={<Registration />} />

@@ -446,7 +446,6 @@ export default function Home() {
           <span className="hero-readout__dot" />
         </div>
 
-        {/* CTA Section */}
         <div className="hero-cta">
           <button className="hero-cta__btn"
             onClick={() => { playClick(); navigate('/dashboard'); }}
@@ -455,12 +454,20 @@ export default function Home() {
             <span className="hero-cta__shimmer" />
             <span className="hero-cta__text">INITIALIZE ARENA</span>
           </button>
-          <button className="hero-cta__secondary"
-            onClick={() => { playClick(); navigate('/leaderboard'); }}
-            onMouseEnter={playHover}>
-            <span className="hero-cta__sec-icon">◆</span>
-            VIEW GLOBAL HALL OF FAME
-          </button>
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <button className="hero-cta__secondary"
+              onClick={() => { playClick(); navigate('/leaderboard'); }}
+              onMouseEnter={playHover}>
+              <span className="hero-cta__sec-icon">◆</span>
+              VIEW GLOBAL HALL OF FAME
+            </button>
+            <button className="hero-cta__secondary"
+              onClick={() => { playClick(); navigate('/instructions'); }}
+              onMouseEnter={playHover}>
+              <span className="hero-cta__sec-icon">📖</span>
+              OPERATIONAL MANUAL
+            </button>
+          </div>
         </div>
 
         {/* Footer */}
