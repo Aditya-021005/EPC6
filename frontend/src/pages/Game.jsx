@@ -104,7 +104,7 @@ export default function Game() {
     // Occasional glitch disruption
     const glitchInterval = setInterval(() => {
       const s = stateRef.current;
-      if (!s.isPaused && !s.gameOver && !s.isAnswerShown && Math.random() > 0.7) {
+      if (!s.isPaused && !s.roundOver && !s.isAnswerShown && Math.random() > 0.7) {
         setGlitchActive(true);
         setTimeout(() => setGlitchActive(false), 800);
       }
@@ -341,7 +341,7 @@ export default function Game() {
 
   const correctAnswer = useCallback(() => {
     const s = stateRef.current;
-    if (s.isAnswerShown || s.gameOver || s.isPaused) return;
+    if (s.isAnswerShown || s.roundOver || s.isPaused) return;
     playCorrect();
 
     const newCombo = s.combo + 1;
@@ -393,7 +393,7 @@ export default function Game() {
 
   const wrongAnswer = useCallback(() => {
     const s = stateRef.current;
-    if (s.isAnswerShown || s.gameOver || s.isPaused) return;
+    if (s.isAnswerShown || s.roundOver || s.isPaused) return;
     playWrong();
 
     setShake('wrong');
@@ -423,7 +423,7 @@ export default function Game() {
 
   const togglePause = useCallback(() => {
     const s = stateRef.current;
-    if (s.isAnswerShown || s.gameOver) return;
+    if (s.isAnswerShown || s.roundOver) return;
     setIsPaused(prev => {
       const newPaused = !prev;
       if (newPaused) {
@@ -514,13 +514,15 @@ export default function Game() {
 
   // --- HOST REMOTE POLLING ---
   useEffect(() => {
-    if (loading || !dataLoaded || gameOver) return;
+    if (loading || !dataLoaded || roundOver) return;
 
     const currentQuestion = questions[currentIndex];
-    const imagePath = currentQuestion?.image;
-    const imageUrl = imagePath?.startsWith('http') || imagePath?.startsWith('/media')
-      ? imagePath
-      : `/images/${imagePath}`;
+    const getImgUrl = (imgPath) => {
+      if (!imgPath) return undefined;
+      return imgPath.startsWith('http') || imgPath.startsWith('/media') ? imgPath : `/images/${imgPath}`;
+    };
+    const imageUrl = getImgUrl(currentQuestion?.image);
+    const nextImageUrl = currentIndex + 1 < questions.length ? getImgUrl(questions[currentIndex + 1]?.image) : null;
 
     let isSubscribed = true;
     const interval = setInterval(async () => {
@@ -537,6 +539,7 @@ export default function Game() {
           current_user: s.currentUser,
           is_paused: s.isPaused,
           image: imageUrl,
+          preload_image: nextImageUrl,
           answer: currentQuestion?.answer
         }
       };
@@ -558,23 +561,25 @@ export default function Game() {
       } catch (e) {
         console.error('Remote sync error:', e);
       }
-    }, 1000);
+    }, 300);
 
     return () => {
       isSubscribed = false;
       clearInterval(interval);
     };
-  }, [loading, dataLoaded, gameOver, questions, currentIndex, correctAnswer, wrongAnswer, togglePause]);
+  }, [loading, dataLoaded, roundOver, questions, currentIndex, correctAnswer, wrongAnswer, togglePause]);
 
   useEffect(() => {
-    if (gameOver) {
+    // Gracefully wipe the remote session when the game unmounts (ABORT or Round End)
+    return () => {
       fetch('/api/remote/client', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state_data: { status: 'GAMEOVER' } })
-      }).catch(e => console.error(e));
-    }
-  }, [gameOver]);
+        body: JSON.stringify({ state_data: { status: 'GAMEOVER' } }),
+        keepalive: true
+      }).catch(e => console.error('Failed to clear session:', e));
+    };
+  }, []);
 
   if (loading || !dataLoaded) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;

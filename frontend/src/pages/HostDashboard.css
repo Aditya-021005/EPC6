@@ -8,6 +8,11 @@
   padding: 20px;
   position: relative;
   overflow-x: hidden;
+  max-width: 600px;
+  margin: 0 auto;
+  border-left: 1px solid rgba(0, 240, 255, 0.1);
+  border-right: 1px solid rgba(0, 240, 255, 0.1);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
 }
 
 .host-header {
@@ -231,6 +236,61 @@
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 5px;
+}
+
+@media (min-width: 768px) {
+  .host-wrapper {
+    max-width: 1000px;
+    padding: 40px;
+    justify-content: center;
+  }
+
+  .host-active-screen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "stats answer"
+      "players answer"
+      "pause answer"
+      "controls controls";
+    align-items: start;
+    gap: 30px;
+  }
+
+  .host-stats-bar {
+    grid-area: stats;
+  }
+
+  .host-players {
+    grid-area: players;
+  }
+
+  .host-paused-banner {
+    grid-area: pause;
+  }
+
+  .host-controls {
+    grid-area: controls;
+    margin-top: 20px;
+  }
+
+  .host-answer-box {
+    grid-area: answer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .host-thumb {
+    max-height: 250px;
+  }
+
+  .answer-value {
+    font-size: 48px;
+  }
 }
 
 /* Paused Banner */

@@ -11,27 +11,46 @@ export default function HostDashboard() {
   const [gameState, setGameState] = useState(null);
   const [connectionError, setConnectionError] = useState(false);
 
+  const fetchState = async () => {
+    if (!isAuthenticated) return;
+    try {
+      const res = await fetch('/api/remote/host');
+      if (!res.ok) throw new Error('Network error');
+      const data = await res.json();
+      setGameState(data.state_data);
+      setConnectionError(false);
+    } catch (err) {
+      console.error('Host sync error:', err);
+      setConnectionError(true);
+    }
+  };
+
   // Poll global state
   useEffect(() => {
     if (!isAuthenticated) return;
-
-    const fetchState = async () => {
-      try {
-        const res = await fetch('/api/remote/host');
-        if (!res.ok) throw new Error('Network error');
-        const data = await res.json();
-        setGameState(data.state_data);
-        setConnectionError(false);
-      } catch (err) {
-        console.error('Host sync error:', err);
-        setConnectionError(true);
-      }
-    };
-
     fetchState();
-    const interval = setInterval(fetchState, 1000);
+    const interval = setInterval(fetchState, 300);
     return () => clearInterval(interval);
   }, [isAuthenticated]);
+
+  // Keyboard controls
+  useEffect(() => {
+    if (!isAuthenticated || !gameState || gameState.status === 'GAMEOVER') return;
+
+    const handleKeyDown = (e) => {
+      // Prevent default scrolling for spacebar
+      if (e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        if (e.key === ' ') e.preventDefault();
+      }
+
+      if (e.key === 'ArrowLeft') sendCommand('WRONG');
+      else if (e.key === 'ArrowRight') sendCommand('CORRECT');
+      else if (e.key === ' ') sendCommand('PAUSE');
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAuthenticated, gameState]);
 
   const sendCommand = async (cmd) => {
     try {
@@ -40,7 +59,7 @@ export default function HostDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ command: cmd })
       });
-      // Optionally trigger an immediate fetch so UI feels responsive
+      fetchState(); // Instantly visually respond
     } catch (err) {
       console.error('Command dispatch error:', err);
     }
@@ -129,6 +148,9 @@ export default function HostDashboard() {
             </div>
             {gameState.image && (
               <img src={gameState.image} alt="Target" className="host-thumb" />
+            )}
+            {gameState.preload_image && (
+              <img src={gameState.preload_image} alt="Preload" style={{ display: 'none' }} />
             )}
           </div>
 
