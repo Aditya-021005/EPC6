@@ -9,5 +9,7 @@ urlpatterns = [
     path('dashboard-data', views.get_dashboard_data),
     path('admin/stats', views.get_stats),
     path('health-check', views.health_check),
+    path('remote/client', views.remote_client_sync),
+    path('remote/host', views.remote_host_sync),
 ]
 

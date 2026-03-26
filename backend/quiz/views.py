@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 import logging
 
-from .models import Category, Subcategory, Question, MatchResult
+from .models import Category, Subcategory, Question, MatchResult, GlobalGameSession
 from .serializers import CategorySerializer, SubcategorySerializer, QuestionSerializer, MatchResultSerializer
 
 logger = logging.getLogger(__name__)
@@ -203,4 +203,38 @@ def get_stats(request):
         'questions': Question.objects.count(),
         'matches': MatchResult.objects.count()
     })
+
+@api_view(['POST'])
+def remote_client_sync(request):
+    """ Main presentation screen polls this continuously. 
+        It pushes its state and reads/clears pending commands from the host. """
+    session, created = GlobalGameSession.objects.get_or_create(id=1)
+    
+    state_data = request.data.get('state_data')
+    if state_data is not None:
+        session.state_data = state_data
+    
+    cmd = session.command
+    if cmd:
+        # Clear the command so it only executes once
+        session.command = ""
+        
+    session.save()
+    return Response({'command': cmd})
+
+@api_view(['GET', 'POST'])
+def remote_host_sync(request):
+    """ Host phone calls this. 
+        GET: Returns the current state of the main screen.
+        POST: Pushes a command for the main screen to execute. """
+    session, created = GlobalGameSession.objects.get_or_create(id=1)
+    
+    if request.method == 'POST':
+        command = request.data.get('command')
+        if command:
+            session.command = command
+            session.save()
+            return Response({'success': True})
+            
+    return Response({'state_data': session.state_data})
 

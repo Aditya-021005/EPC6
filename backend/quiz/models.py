@@ -44,3 +44,12 @@ class MatchResult(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
+
+class GlobalGameSession(models.Model):
+    """Singleton model holding the live state of the active projector screen."""
+    state_data = models.JSONField(default=dict)
+    command = models.CharField(max_length=50, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Global Session: {self.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
