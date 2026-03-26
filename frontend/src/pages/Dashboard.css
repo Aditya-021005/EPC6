@@ -115,10 +115,16 @@
 }
 
 .dash-launch-btn:hover {
-  border-color: rgba(0, 240, 255, 0.5);
-  background: rgba(0, 240, 255, 0.1);
-  box-shadow: 0 4px 30px rgba(0, 240, 255, 0.15);
-  transform: translateY(-3px);
+  border-color: rgba(0, 240, 255, 0.8);
+  background: rgba(0, 240, 255, 0.15);
+  box-shadow: 0 8px 40px rgba(0, 240, 255, 0.3), inset 0 0 20px rgba(0, 240, 255, 0.15);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.dash-launch-btn:hover .dash-launch-text {
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.8);
+  letter-spacing: 4px;
+  color: #fff;
 }
 
 .dash-launch-icon {

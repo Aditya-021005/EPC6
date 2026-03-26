@@ -288,9 +288,9 @@
 
 .paused-text {
   font-family: var(--font-display);
-  font-size: 42px;
+  font-size: clamp(24px, 4vw, 42px);
   font-weight: 900;
-  letter-spacing: 12px;
+  letter-spacing: clamp(6px, 1vw, 12px);
   color: var(--gold);
   text-shadow: 0 0 20px var(--gold-glow);
   animation: pulseStatic 2s infinite;
@@ -319,8 +319,13 @@
 }
 
 .btn-hud:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 255, 255, 0.15);
+  border-color: rgba(0, 255, 255, 0.8);
+  color: var(--cyan);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.2);
+  transform: translateY(-2px);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  letter-spacing: 3px;
 }
 
 .btn-hud.primary {
@@ -333,9 +338,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 15px;
   width: 100%;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 .hud-utility-btns {
@@ -387,6 +392,14 @@
   box-shadow: inset 0 0 20px rgba(255, 51, 85, 0.1);
 }
 
+.touch-btn.reject:hover {
+  border-color: rgba(255, 51, 85, 0.8);
+  box-shadow: inset 0 0 40px rgba(255, 51, 85, 0.25), 0 0 30px rgba(255, 51, 85, 0.4);
+  transform: translateY(-4px) scale(1.02);
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 51, 85, 0.8);
+}
+
 .touch-btn.reject:active {
   background: rgba(255, 51, 85, 0.3);
   transform: scale(0.95);
@@ -398,6 +411,14 @@
   border: 1px solid rgba(0, 255, 136, 0.4);
   color: var(--green);
   box-shadow: inset 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+.touch-btn.identify:hover {
+  border-color: rgba(0, 255, 136, 0.8);
+  box-shadow: inset 0 0 40px rgba(0, 255, 136, 0.25), 0 0 30px rgba(0, 255, 136, 0.4);
+  transform: translateY(-4px) scale(1.02);
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
 }
 
 .touch-btn.identify:active {
@@ -1261,8 +1282,10 @@
 }
 
 .powerup-btn:not(:disabled):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  z-index: 10;
 }
 
 .powerup-btn.timeWarp {
@@ -1271,8 +1294,9 @@
 
 .powerup-btn.timeWarp:not(:disabled):hover {
   border-color: var(--cyan);
-  background: rgba(0, 240, 255, 0.1);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  background: rgba(0, 240, 255, 0.15);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.4), inset 0 0 20px rgba(0, 240, 255, 0.2);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
 }
 
 .powerup-btn.neuralHack {
@@ -1281,8 +1305,9 @@
 
 .powerup-btn.neuralHack:not(:disabled):hover {
   border-color: var(--magenta);
-  background: rgba(255, 0, 200, 0.1);
-  box-shadow: 0 0 20px rgba(255, 0, 200, 0.2);
+  background: rgba(255, 0, 200, 0.15);
+  box-shadow: 0 0 30px rgba(255, 0, 200, 0.4), inset 0 0 20px rgba(255, 0, 200, 0.2);
+  text-shadow: 0 0 10px rgba(255, 0, 200, 0.8);
 }
 
 .powerup-btn.shield {
@@ -1291,8 +1316,9 @@
 
 .powerup-btn.shield:not(:disabled):hover {
   border-color: var(--gold);
-  background: rgba(255, 215, 0, 0.1);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+  background: rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.2);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
 }
 
 .powerup-btn.sabotage {
@@ -1301,8 +1327,9 @@
 
 .powerup-btn.sabotage:not(:disabled):hover {
   border-color: var(--red);
-  background: rgba(255, 51, 85, 0.1);
-  box-shadow: 0 0 20px rgba(255, 51, 85, 0.2);
+  background: rgba(255, 51, 85, 0.15);
+  box-shadow: 0 0 30px rgba(255, 51, 85, 0.4), inset 0 0 20px rgba(255, 51, 85, 0.2);
+  text-shadow: 0 0 10px rgba(255, 51, 85, 0.8);
 }
 
 /* Sabotage flash overlay */
@@ -2240,5 +2267,48 @@
 
   .briefing-vs {
     font-size: 10px;
+  }
+}
+
+/* --- Vertical Responsiveness Fixes --- */
+@media (max-height: 800px) {
+  .arena-layout {
+    padding: 10px 20px;
+    gap: 15px;
+  }
+
+  .combat-node {
+    max-width: 600px;
+    /* Constraining width forces aspect-ratio to yield smaller height */
+  }
+
+  .arena-actions-bar {
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .hud-utility-btns {
+    gap: 10px;
+  }
+}
+
+@media (max-height: 700px) {
+  .combat-node {
+    max-width: 500px;
+  }
+
+  .hud-peripheral {
+    transform: scale(0.9);
+    transform-origin: center;
+  }
+}
+
+@media (max-height: 600px) {
+  .combat-node {
+    max-width: 400px;
+  }
+
+  .hud-peripheral {
+    transform: scale(0.8);
   }
 }
