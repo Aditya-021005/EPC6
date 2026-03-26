@@ -462,7 +462,7 @@ export default function Home() {
               VIEW GLOBAL HALL OF FAME
             </button>
             <button className="hero-cta__secondary"
-              onClick={() => { playClick(); navigate('/instructions'); }}
+              onClick={() => { playClick(); navigate('/instructions', { state: { fromHome: true } }); }}
               onMouseEnter={playHover}>
               <span className="hero-cta__sec-icon">📖</span>
               OPERATIONAL MANUAL

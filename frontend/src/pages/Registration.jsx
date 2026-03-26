@@ -87,7 +87,7 @@ export default function Registration() {
     localStorage.setItem('roundScores', JSON.stringify([]));
     localStorage.setItem('roundPicker', '1'); // P1 picks first round
     setFadeOut(true);
-    setTimeout(() => navigate('/round-select'), 600);
+    setTimeout(() => navigate('/instructions'), 600);
   };
 
   const handleKeyDown = (e) => {
