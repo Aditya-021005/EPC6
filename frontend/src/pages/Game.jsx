@@ -512,40 +512,15 @@ export default function Game() {
 
   // (round-end navigation is handled by the roundOver useEffect above)
 
-  if (loading || !dataLoaded) {
-    return <LoadingScreen onComplete={() => setLoading(false)} />;
-  }
-
-  // Helper to render a power-up button for a given player
-  const renderPowerUpBtn = (playerNum, key, activateFn) => {
-    const cfg = POWERUP_CONFIG[key];
-    const unlocked = isUnlocked(playerNum, key);
-    const affordable = canAfford(playerNum, key);
-    const isActive = currentUser === playerNum;
-    return (
-      <button
-        key={key}
-        className={`powerup-btn ${key} ${!unlocked ? 'locked' : ''} ${!affordable ? 'too-expensive' : ''}`}
-        onClick={isActive && affordable ? activateFn : undefined}
-        disabled={!isActive || !affordable}
-        title={unlocked ? `${cfg.title} (Cost: ${cfg.cost} pts)` : `Unlocks at ${cfg.unlockAt} pts`}
-      >
-        <span className="powerup-icon">{unlocked ? cfg.icon : '🔒'}</span>
-        <span className="powerup-name">{cfg.name}</span>
-        <span className="powerup-cost">{unlocked ? `${cfg.cost}p` : `${cfg.unlockAt}p`}</span>
-      </button>
-    );
-  };
-
-  const currentQuestion = questions[currentIndex];
-  const imagePath = currentQuestion?.image;
-  const imageUrl = imagePath?.startsWith('http') || imagePath?.startsWith('/media')
-    ? imagePath
-    : `/images/${imagePath}`;
-
   // --- HOST REMOTE POLLING ---
   useEffect(() => {
     if (loading || !dataLoaded || gameOver) return;
+
+    const currentQuestion = questions[currentIndex];
+    const imagePath = currentQuestion?.image;
+    const imageUrl = imagePath?.startsWith('http') || imagePath?.startsWith('/media')
+      ? imagePath
+      : `/images/${imagePath}`;
 
     let isSubscribed = true;
     const interval = setInterval(async () => {
@@ -589,7 +564,7 @@ export default function Game() {
       isSubscribed = false;
       clearInterval(interval);
     };
-  }, [loading, dataLoaded, gameOver, imageUrl, currentQuestion, correctAnswer, wrongAnswer, togglePause]);
+  }, [loading, dataLoaded, gameOver, questions, currentIndex, correctAnswer, wrongAnswer, togglePause]);
 
   useEffect(() => {
     if (gameOver) {
@@ -600,6 +575,37 @@ export default function Game() {
       }).catch(e => console.error(e));
     }
   }, [gameOver]);
+
+  if (loading || !dataLoaded) {
+    return <LoadingScreen onComplete={() => setLoading(false)} />;
+  }
+
+  // Helper to render a power-up button for a given player
+  const renderPowerUpBtn = (playerNum, key, activateFn) => {
+    const cfg = POWERUP_CONFIG[key];
+    const unlocked = isUnlocked(playerNum, key);
+    const affordable = canAfford(playerNum, key);
+    const isActive = currentUser === playerNum;
+    return (
+      <button
+        key={key}
+        className={`powerup-btn ${key} ${!unlocked ? 'locked' : ''} ${!affordable ? 'too-expensive' : ''}`}
+        onClick={isActive && affordable ? activateFn : undefined}
+        disabled={!isActive || !affordable}
+        title={unlocked ? `${cfg.title} (Cost: ${cfg.cost} pts)` : `Unlocks at ${cfg.unlockAt} pts`}
+      >
+        <span className="powerup-icon">{unlocked ? cfg.icon : '🔒'}</span>
+        <span className="powerup-name">{cfg.name}</span>
+        <span className="powerup-cost">{unlocked ? `${cfg.cost}p` : `${cfg.unlockAt}p`}</span>
+      </button>
+    );
+  };
+
+  const currentQuestion = questions[currentIndex];
+  const imagePath = currentQuestion?.image;
+  const imageUrl = imagePath?.startsWith('http') || imagePath?.startsWith('/media')
+    ? imagePath
+    : `/images/${imagePath}`;
 
   return (
     <div className={`page-wrapper ${shake ? 'arena-shake' : ''}`}>
