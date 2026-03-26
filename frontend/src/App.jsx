@@ -12,6 +12,8 @@ import Leaderboard from './pages/Leaderboard';
 import Instructions from './pages/Instructions';
 import AnimatedBackground from './components/AnimatedBackground';
 
+import HostDashboard from './pages/HostDashboard';
+
 function App() {
   return (
     <AudioProvider>
@@ -28,6 +30,7 @@ function App() {
           <Route path="/game/:quizId" element={<Game />} />
           <Route path="/gameover" element={<GameOver />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/host" element={<HostDashboard />} />
         </Routes>
         <AnimatedBackground />
       </Router>

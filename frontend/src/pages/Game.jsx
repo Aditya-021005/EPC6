@@ -543,6 +543,64 @@ export default function Game() {
     ? imagePath
     : `/images/${imagePath}`;
 
+  // --- HOST REMOTE POLLING ---
+  useEffect(() => {
+    if (loading || !dataLoaded || gameOver) return;
+
+    let isSubscribed = true;
+    const interval = setInterval(async () => {
+      const s = stateRef.current;
+      const payload = {
+        state_data: {
+          status: s.showTransition ? 'TRANSITION' : 'ACTIVE',
+          round: s.currentRound,
+          target: s.currentIndex + 1,
+          total_targets: s.questions.length,
+          scores: s.scores,
+          player1: s.player1,
+          player2: s.player2,
+          current_user: s.currentUser,
+          is_paused: s.isPaused,
+          image: imageUrl,
+          answer: currentQuestion?.answer
+        }
+      };
+
+      try {
+        const res = await fetch('/api/remote/client', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (isSubscribed && data.command) {
+          console.log('[HOST COMMAND RECEIVED]:', data.command);
+          if (data.command === 'CORRECT') correctAnswer();
+          if (data.command === 'WRONG') wrongAnswer();
+          if (data.command === 'PAUSE') togglePause();
+        }
+      } catch (e) {
+        console.error('Remote sync error:', e);
+      }
+    }, 1000);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
+  }, [loading, dataLoaded, gameOver, imageUrl, currentQuestion, correctAnswer, wrongAnswer, togglePause]);
+
+  useEffect(() => {
+    if (gameOver) {
+      fetch('/api/remote/client', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state_data: { status: 'GAMEOVER' } })
+      }).catch(e => console.error(e));
+    }
+  }, [gameOver]);
+
   return (
     <div className={`page-wrapper ${shake ? 'arena-shake' : ''}`}>
       {/* Power-Up Flash Overlay */}
