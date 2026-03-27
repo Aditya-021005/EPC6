@@ -641,6 +641,16 @@
   stroke-linejoin: round;
   filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.6));
   transition: all 0.3s ease;
+
+ 
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: ekg-scroll 1.8s linear infinite;
+}
+
+@keyframes ekg-scroll {
+  from { stroke-dashoffset: 300; }
+  to   { stroke-dashoffset: -300; }
 }
 
 .ekg-dot {

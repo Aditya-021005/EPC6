@@ -10,7 +10,7 @@ const ScrambledText = ({ text, delay = 0 }) => {
   const [displayText, setDisplayText] = useState('');
   const chars = '!@#$%^&*()_+~`|}{[]:;?><,./-=ABCDEFアイウ01';
   useEffect(() => {
-    let timeout; let frame = 0; const totalFrames = 18;
+    let timeout; let frame = 0; const totalFrames = 28;
     timeout = setTimeout(() => {
       const iv = setInterval(() => {
         if (frame >= totalFrames) { setDisplayText(text); clearInterval(iv); return; }
@@ -30,9 +30,8 @@ const ScrambledText = ({ text, delay = 0 }) => {
 
 /* ── EKG waveform ── */
 function EkgLine({ spike }) {
-  const pts = spike
-    ? '0,24 30,24 38,4 44,44 50,24 60,24 68,14 74,34 80,24 200,24'
-    : '0,24 200,24';
+ // To this:
+const pts = '0,24 30,24 38,4 44,44 50,24 60,24 68,14 74,34 80,24 200,24';
   return (
     <svg className="ekg-svg" viewBox="0 0 200 48" preserveAspectRatio="none">
       <polyline className="ekg-line" points={pts} />
