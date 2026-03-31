@@ -78,20 +78,11 @@ export default function Instructions() {
 
               <div className="inst-powerup">
                 <div className="inst-pu-header">
-                  <span className="inst-pu-icon">🧠</span>
-                  <span className="inst-pu-name">NEURAL HACK</span>
-                </div>
-                <div className="inst-pu-cost">COST: 150 PTS</div>
-                <div className="inst-pu-desc">Instantly decodes and reveals the correct target answer on screen for a guaranteed hit.</div>
-              </div>
-
-              <div className="inst-powerup">
-                <div className="inst-pu-header">
                   <span className="inst-pu-icon">🛡️</span>
                   <span className="inst-pu-name">SHIELD</span>
                 </div>
-                <div className="inst-pu-cost">COST: 100 PTS</div>
-                <div className="inst-pu-desc">Deploys a barrier that absorbs the point/time penalty of your next wrong answer.</div>
+                <div className="inst-pu-cost">COST: 150 PTS</div>
+                <div className="inst-pu-desc">Deploys a permanent barrier that blocks all point/time penalties from wrong answers for the entire game.</div>
               </div>
 
               <div className="inst-powerup">
@@ -100,7 +91,7 @@ export default function Instructions() {
                   <span className="inst-pu-name">SABOTAGE</span>
                 </div>
                 <div className="inst-pu-cost">COST: 120 PTS</div>
-                <div className="inst-pu-desc">Disrupts enemy uplink, stripping exactly -5 seconds from opponent's timer.</div>
+                <div className="inst-pu-desc">Disrupts enemy uplink, stripping -30 seconds from opponent's timer. A devastating tactical strike.</div>
               </div>
             </div>
           </section>

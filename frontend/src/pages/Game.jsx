@@ -7,9 +7,8 @@ import useSound from '../hooks/useSound';
 // Power-up economy config
 const POWERUP_CONFIG = {
   timeWarp: { unlockAt: 80, cost: 80, icon: '⏳', name: 'WARP', key: '1', title: 'Time Warp (+15s)' },
-  neuralHack: { unlockAt: 200, cost: 150, icon: '🧠', name: 'HACK', key: '2', title: 'Neural Hack (Reveal Answer)' },
-  shield: { unlockAt: 100, cost: 100, icon: '🛡️', name: 'SHIELD', key: '3', title: 'Shield (Block Penalty)' },
-  sabotage: { unlockAt: 150, cost: 120, icon: '💣', name: 'SABOTAGE', key: '4', title: 'Sabotage (−5s Enemy)' },
+  shield: { unlockAt: 100, cost: 150, icon: '🛡️', name: 'SHIELD', key: '2', title: 'Shield (Block All Penalties)' },
+  sabotage: { unlockAt: 150, cost: 120, icon: '💣', name: 'SABOTAGE', key: '3', title: 'Sabotage (−30s Enemy)' },
 };
 
 export default function Game() {
@@ -24,8 +23,8 @@ export default function Game() {
   const roundCount = parseInt(localStorage.getItem('roundCount') || '3');
   const currentRound = parseInt(localStorage.getItem('currentRound') || '1');
 
-  // Restore timers & scores from previous rounds (persisted in localStorage)
-  const savedTimers = (() => { try { return JSON.parse(localStorage.getItem('timers')); } catch { return null; } })();
+  // Restore scores from previous rounds (persisted in localStorage)
+  // Note: Timers reset each round — only scores carry over
   const savedScores = (() => { try { return JSON.parse(localStorage.getItem('scores')); } catch { return null; } })();
 
   // Game state
@@ -36,7 +35,7 @@ export default function Game() {
   const [quizMeta, setQuizMeta] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState(1);
-  const [timers, setTimers] = useState(savedTimers || { 1: 120, 2: 120 });
+  const [timers, setTimers] = useState({ 1: 120, 2: 120 });
   const [scores, setScores] = useState(savedScores || { 1: 0, 2: 0 });
   const [isPaused, setIsPaused] = useState(false);
   const [isAnswerShown, setIsAnswerShown] = useState(false);
@@ -56,7 +55,7 @@ export default function Game() {
   // Power-ups are now reusable — no "used" tracking
   const [speedBonus, setSpeedBonus] = useState(null);
   const [shieldActive, setShieldActive] = useState(false);
-  const [hackRevealed, setHackRevealed] = useState(false);
+
   const [powerUpFlash, setPowerUpFlash] = useState(null);
 
   // Round transition state
@@ -78,7 +77,7 @@ export default function Game() {
     isPaused: false,
     isAnswerShown: false,
     roundOver: false,
-    timers: savedTimers || { 1: 120, 2: 120 },
+    timers: { 1: 120, 2: 120 },
     scores: savedScores || { 1: 0, 2: 0 },
     questions: [],
     currentIndex: 0,
@@ -166,8 +165,7 @@ export default function Game() {
     const roundScore2 = s.scores[2] - prevScores[2];
     const roundWinner = roundScore1 >= roundScore2 ? 1 : 2;
 
-    // Save cumulative state
-    localStorage.setItem('timers', JSON.stringify(s.timers));
+    // Save cumulative scores (timers reset each round)
     localStorage.setItem('scores', JSON.stringify(s.scores));
 
     // Append round result
@@ -306,7 +304,7 @@ export default function Game() {
     setCurrentIndex(prev => prev + 1);
     setIsAnswerShown(false);
     setAnswerResult(null);
-    setHackRevealed(false);
+
     questionStartTimeRef.current = Date.now();
     startTimer();
   }, [startTimer]);
@@ -315,7 +313,7 @@ export default function Game() {
     clearInterval(intervalRef.current);
     intervalRef.current = null;
     setIsAnswerShown(true);
-    setHackRevealed(false);
+
 
     const s = stateRef.current;
     const answer = s.questions[s.currentIndex]?.answer || 'Unknown';
@@ -403,9 +401,8 @@ export default function Game() {
     // Track stats
     setWrongCounts(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] + 1 }));
 
-    // Shield blocks the penalty
+    // Shield blocks the penalty (persists for the entire game)
     if (s.shieldActive) {
-      setShieldActive(false);
       setPowerUpFlash('shield-absorb');
       setTimeout(() => setPowerUpFlash(null), 800);
     } else {
@@ -457,17 +454,7 @@ export default function Game() {
     setTimeout(() => setPowerUpFlash(null), 800);
   }, []);
 
-  const activateNeuralHack = useCallback(() => {
-    const s = stateRef.current;
-    if (s.isAnswerShown || s.roundOver || s.isPaused) return;
-    const cfg = POWERUP_CONFIG.neuralHack;
-    if (s.scores[s.currentUser] < cfg.unlockAt || s.scores[s.currentUser] < cfg.cost) return;
-    setScores(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] - cfg.cost }));
-    setHackRevealed(true);
-    setPowerUpFlash('neuralHack');
-    setTimeout(() => setPowerUpFlash(null), 800);
-    setTimeout(() => setHackRevealed(false), 3000);
-  }, []);
+
 
   const activateShield = useCallback(() => {
     const s = stateRef.current;
@@ -487,7 +474,7 @@ export default function Game() {
     if (s.scores[s.currentUser] < cfg.unlockAt || s.scores[s.currentUser] < cfg.cost) return;
     const opponent = s.currentUser === 1 ? 2 : 1;
     setScores(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] - cfg.cost }));
-    setTimers(prev => ({ ...prev, [opponent]: Math.max(0, prev[opponent] - 5) }));
+    setTimers(prev => ({ ...prev, [opponent]: Math.max(0, prev[opponent] - 30) }));
     setPowerUpFlash('sabotage');
     setTimeout(() => setPowerUpFlash(null), 800);
   }, []);
@@ -502,13 +489,12 @@ export default function Game() {
         togglePause();
       }
       else if (e.key === '1') activateTimeWarp();
-      else if (e.key === '2') activateNeuralHack();
-      else if (e.key === '3') activateShield();
-      else if (e.key === '4') activateSabotage();
+      else if (e.key === '2') activateShield();
+      else if (e.key === '3') activateSabotage();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [wrongAnswer, correctAnswer, togglePause, activateTimeWarp, activateNeuralHack, activateShield, activateSabotage]);
+  }, [wrongAnswer, correctAnswer, togglePause, activateTimeWarp, activateShield, activateSabotage]);
 
   // (round-end navigation is handled by the roundOver useEffect above)
 
@@ -697,7 +683,6 @@ export default function Game() {
             <div className="powerups-label">TACTICAL SYSTEMS</div>
             <div className="powerups-grid">
               {renderPowerUpBtn(1, 'timeWarp', activateTimeWarp)}
-              {renderPowerUpBtn(1, 'neuralHack', activateNeuralHack)}
               {renderPowerUpBtn(1, 'shield', activateShield)}
               {renderPowerUpBtn(1, 'sabotage', activateSabotage)}
             </div>
@@ -744,15 +729,7 @@ export default function Game() {
               </div>
             )}
 
-            {/* Neural Hack Reveal */}
-            {hackRevealed && (
-              <div className="hack-reveal-overlay">
-                <div className="hack-reveal-text">
-                  <span className="hack-label">INTEL DECODED:</span>
-                  <span className="hack-answer">{questions[currentIndex]?.answer}</span>
-                </div>
-              </div>
-            )}
+
 
             {/* Corner Markers */}
             <div className="corner-detail tl"></div>
@@ -847,7 +824,6 @@ export default function Game() {
             <div className="powerups-label">TACTICAL SYSTEMS</div>
             <div className="powerups-grid">
               {renderPowerUpBtn(2, 'timeWarp', activateTimeWarp)}
-              {renderPowerUpBtn(2, 'neuralHack', activateNeuralHack)}
               {renderPowerUpBtn(2, 'shield', activateShield)}
               {renderPowerUpBtn(2, 'sabotage', activateSabotage)}
             </div>
