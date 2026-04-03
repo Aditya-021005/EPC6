@@ -4,13 +4,13 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: stretch;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
   width: 100%;
   margin: 0 auto;
   position: relative;
   z-index: 10;
-  padding: 10px 16px;
+  padding: 16px 24px;
   perspective: 1200px;
 }
 
@@ -663,8 +663,8 @@
   display: flex !important;
   flex-direction: row;
   justify-content: center;
-  align-items: stretch;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
   width: 100vw;
   height: 100vh;
   padding: 16px 24px;
@@ -676,17 +676,18 @@
   flex: 0 0 clamp(150px, 12vw, 200px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  background: rgba(10, 15, 30, 0.68);
+  gap: 10px;
+  background: rgba(10, 15, 30, 0.75);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 255, 255, 0.3);
-  padding: clamp(10px, 1.2vw, 16px);
-  border-radius: 12px;
+  border: 1px solid rgba(0, 255, 255, 0.25);
+  padding: 14px 12px;
+  border-radius: 14px;
   position: relative;
   transition: all 0.4s ease;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   opacity: 1;
   overflow: hidden;
+  height: auto;
 }
 
 
@@ -873,7 +874,7 @@
 /* Combat Node (Central Viewport) */
 .combat-node {
   flex: 1;
-  max-width: 1200px;
+  max-width: 900px;
   min-width: 0;
   display: flex;
   flex-direction: column;
