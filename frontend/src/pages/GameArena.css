@@ -874,7 +874,7 @@
 /* Combat Node (Central Viewport) */
 .combat-node {
   flex: 1;
-  max-width: 900px;
+  max-width: 110px;
   min-width: 0;
   display: flex;
   flex-direction: column;
