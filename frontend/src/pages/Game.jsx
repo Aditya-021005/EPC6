@@ -54,9 +54,10 @@ export default function Game() {
   const [maxCombo, setMaxCombo] = useState({ 1: 0, 2: 0 });
   const [streakMilestone, setStreakMilestone] = useState(null);
 
-  // Power-ups are now reusable — no "used" tracking
+  // Power-ups are now reusable — no "used" tracking (except shield)
   const [speedBonus, setSpeedBonus] = useState(null);
   const [shieldActive, setShieldActive] = useState(false);
+  const [shieldUsed, setShieldUsed] = useState({ 1: false, 2: false });
 
   const [powerUpFlash, setPowerUpFlash] = useState(null);
 
@@ -95,10 +96,10 @@ export default function Game() {
     stateRef.current = {
       currentUser, isPaused, isAnswerShown, roundOver,
       timers, scores, questions, currentIndex, combo,
-      shieldActive,
+      shieldActive, shieldUsed,
       correctCounts, wrongCounts, maxCombo,
     };
-  }, [currentUser, isPaused, isAnswerShown, roundOver, timers, scores, questions, currentIndex, combo, shieldActive, correctCounts, wrongCounts, maxCombo]);
+  }, [currentUser, isPaused, isAnswerShown, roundOver, timers, scores, questions, currentIndex, combo, shieldActive, shieldUsed, correctCounts, wrongCounts, maxCombo]);
 
   // Initialize audio removal/cleanup
   useEffect(() => {
@@ -392,7 +393,7 @@ export default function Game() {
     }));
 
     showAnswer(true);
-  }, [showAnswer]);
+  }, [showAnswer, unlockAudio, playCorrect]);
 
   const wrongAnswer = useCallback(() => {
     const s = stateRef.current;
@@ -424,7 +425,7 @@ export default function Game() {
       }));
     }
     showAnswer(false);
-  }, [showAnswer]);
+  }, [showAnswer, unlockAudio, playWrong]);
 
   const togglePause = useCallback(() => {
     const s = stateRef.current;
@@ -467,10 +468,12 @@ export default function Game() {
   const activateShield = useCallback(() => {
     const s = stateRef.current;
     if (s.isAnswerShown || s.roundOver || s.isPaused) return;
+    if (s.shieldUsed[s.currentUser]) return; // Already used by this player
     const cfg = POWERUP_CONFIG.shield;
     if (s.scores[s.currentUser] < cfg.unlockAt || s.scores[s.currentUser] < cfg.cost) return;
     setScores(prev => ({ ...prev, [s.currentUser]: prev[s.currentUser] - cfg.cost }));
     setShieldActive(true);
+    setShieldUsed(prev => ({ ...prev, [s.currentUser]: true }));
     setPowerUpFlash('shield');
     setTimeout(() => setPowerUpFlash(null), 800);
   }, []);
@@ -585,17 +588,19 @@ export default function Game() {
     const unlocked = isUnlocked(playerNum, key);
     const affordable = canAfford(playerNum, key);
     const isActive = currentUser === playerNum;
+    const isShieldUsed = key === 'shield' && shieldUsed[playerNum];
+    const isDisabled = !isActive || !affordable || isShieldUsed;
     return (
       <button
         key={key}
-        className={`powerup-btn ${key} ${!unlocked ? 'locked' : ''} ${!affordable ? 'too-expensive' : ''}`}
-        onClick={isActive && affordable ? activateFn : undefined}
-        disabled={!isActive || !affordable}
-        title={unlocked ? `${cfg.title} (Cost: ${cfg.cost} pts)` : `Unlocks at ${cfg.unlockAt} pts`}
+        className={`powerup-btn ${key} ${!unlocked ? 'locked' : ''} ${!affordable ? 'too-expensive' : ''} ${isShieldUsed ? 'used' : ''}`}
+        onClick={isActive && affordable && !isShieldUsed ? activateFn : undefined}
+        disabled={isDisabled}
+        title={isShieldUsed ? 'Shield already used' : unlocked ? `${cfg.title} (Cost: ${cfg.cost} pts)` : `Unlocks at ${cfg.unlockAt} pts`}
       >
-        <span className="powerup-icon">{unlocked ? cfg.icon : '🔒'}</span>
-        <span className="powerup-name">{cfg.name}</span>
-        <span className="powerup-cost">{unlocked ? `${cfg.cost}p` : `${cfg.unlockAt}p`}</span>
+        <span className="powerup-icon">{isShieldUsed ? '✓' : unlocked ? cfg.icon : '🔒'}</span>
+        <span className="powerup-name">{isShieldUsed ? 'USED' : cfg.name}</span>
+        <span className="powerup-cost">{isShieldUsed ? '—' : unlocked ? `${cfg.cost}p` : `${cfg.unlockAt}p`}</span>
       </button>
     );
   };

@@ -60,7 +60,9 @@ const useSound = (src, options = {}) => {
 
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        console.log(`[useSound] Successfully played: ${src} (Vol: ${audioRef.current.volume})`);
+        if (audioRef.current) {
+          console.log(`[useSound] Successfully played: ${src} (Vol: ${audioRef.current.volume})`);
+        }
       }).catch(err => {
         if (err.name === 'NotAllowedError') {
           console.warn(`[useSound] Playback blocked for ${src}. Will retry after unlock.`);
