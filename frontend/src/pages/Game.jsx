@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import './GameArena.css';
 import LoadingScreen from '../components/LoadingScreen';
 import useSound from '../hooks/useSound';
+import { useAudio } from '../context/AudioContext';
 
 // Power-up economy config
 const POWERUP_CONFIG = {
@@ -14,6 +15,7 @@ const POWERUP_CONFIG = {
 export default function Game() {
   const { quizId } = useParams();
   const navigate = useNavigate();
+  const { unlockAudio, globalVolume } = useAudio();
 
   // Players
   const player1 = localStorage.getItem('player1') || 'Player 1';
@@ -340,6 +342,9 @@ export default function Game() {
   const correctAnswer = useCallback(() => {
     const s = stateRef.current;
     if (s.isAnswerShown || s.roundOver || s.isPaused) return;
+    
+    // Proactive unlock on interaction
+    unlockAudio();
     playCorrect();
 
     const newCombo = s.combo + 1;
@@ -392,6 +397,9 @@ export default function Game() {
   const wrongAnswer = useCallback(() => {
     const s = stateRef.current;
     if (s.isAnswerShown || s.roundOver || s.isPaused) return;
+    
+    // Proactive unlock on interaction
+    unlockAudio();
     playWrong();
 
     setShake('wrong');
@@ -693,7 +701,12 @@ export default function Game() {
         <div className="combat-node">
           <div className="combat-data-bar">
             <span>ROUND {currentRound}/{roundCount} — {quizMeta?.category?.toUpperCase()}</span>
-            <span>TARGET: {currentIndex + 1} / {questions.length}</span>
+            <div className="combat-data-center">
+              <span>TARGET: {currentIndex + 1} / {questions.length}</span>
+              <span className="audio-status-icon" title={`System Volume: ${Math.round(globalVolume * 100)}%`}>
+                {globalVolume > 0 ? '🔊' : '🔇'}
+              </span>
+            </div>
             <span>OPS: ACTIVE</span>
           </div>
 

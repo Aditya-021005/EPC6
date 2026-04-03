@@ -4,14 +4,13 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
-  gap: 12px;
+  align-items: stretch;
+  gap: 8px;
   width: 100%;
-  max-width: 2500px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
-  padding: 20px 40px;
+  padding: 10px 16px;
   perspective: 1200px;
 }
 
@@ -664,30 +663,30 @@
   display: flex !important;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
-  gap: 12px;
+  align-items: stretch;
+  gap: 8px;
   width: 100vw;
   height: 100vh;
-  padding: 20px;
+  padding: 10px 16px;
   overflow: hidden;
   perspective: 1200px;
 }
 
 .hud-peripheral {
-  flex: 0 0 clamp(140px, 10vw, 180px);
+  flex: 0 0 clamp(120px, 8vw, 160px);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   background: rgba(10, 15, 30, 0.68);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(0, 255, 255, 0.3);
-  padding: clamp(10px, 1.5vw, 20px);
+  padding: clamp(8px, 1vw, 14px);
   border-radius: 12px;
   position: relative;
   transition: all 0.4s ease;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   opacity: 1;
-  /* Ensure always visible */
+  overflow: hidden;
 }
 
 
@@ -869,7 +868,7 @@
 /* Combat Node (Central Viewport) */
 .combat-node {
   flex: 1;
-  max-width: 1900px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1019,13 +1018,47 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 10px 20px;
-  background: rgba(0, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  align-items: center;
+  padding: 12px 24px;
+  background: rgba(10, 20, 40, 0.4);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.3);
   font-family: var(--font-display);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  z-index: 20;
+}
+
+.combat-data-center {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: var(--text-primary);
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.audio-status-icon {
+  font-size: 14px;
   color: var(--cyan);
+  text-shadow: 0 0 12px var(--cyan-glow);
+  cursor: help;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-status-icon:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--cyan);
+  transform: translateY(-1px) scale(1.1);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
 .arena-actions-bar {
@@ -2333,30 +2366,21 @@
 /* --- Vertical Responsiveness Fixes --- */
 @media (max-height: 800px) {
   .arena-layout {
-    padding: 10px 20px;
-    gap: 15px;
-  }
-
-  .combat-node {
-    max-width: 780px;
-    /* Increased for bigger display on shorter screens */
+    padding: 6px 12px;
+    gap: 6px;
   }
 
   .arena-actions-bar {
-    margin-top: 10px;
-    gap: 10px;
+    margin-top: 6px;
+    gap: 8px;
   }
 
   .hud-utility-btns {
-    gap: 10px;
+    gap: 8px;
   }
 }
 
 @media (max-height: 700px) {
-  .combat-node {
-    max-width: 650px;
-  }
-
   .hud-peripheral {
     transform: scale(0.9);
     transform-origin: center;
@@ -2364,10 +2388,6 @@
 }
 
 @media (max-height: 600px) {
-  .combat-node {
-    max-width: 520px;
-  }
-
   .hud-peripheral {
     transform: scale(0.8);
   }

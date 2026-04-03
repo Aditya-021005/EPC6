@@ -43,24 +43,34 @@ const useSound = (src, options = {}) => {
   }, [globalVolume, localVolume]);
 
   const play = useCallback(() => {
-    if (!audioRef.current) return;
+    if (!audioRef.current) {
+      console.warn(`[useSound] No audio object for ${src}`);
+      return;
+    }
 
     // Double check allowed sounds for extra safety
     if (!ALLOWED_SOUNDS.includes(src)) return;
+
+    // Refresh volume before each play to be absolutely sure
+    audioRef.current.volume = globalVolume * localVolume;
 
     // Reset and play
     audioRef.current.currentTime = 0;
     const playPromise = audioRef.current.play();
 
     if (playPromise !== undefined) {
-      playPromise.catch(err => {
+      playPromise.then(() => {
+        console.log(`[useSound] Successfully played: ${src} (Vol: ${audioRef.current.volume})`);
+      }).catch(err => {
         if (err.name === 'NotAllowedError') {
           console.warn(`[useSound] Playback blocked for ${src}. Will retry after unlock.`);
           wasBlockedRef.current = true;
+        } else {
+          console.error(`[useSound] Error playing ${src}:`, err);
         }
       });
     }
-  }, [src]);
+  }, [src, globalVolume, localVolume]);
 
   // Retry playback once system is unlocked if it was previously blocked
   useEffect(() => {
