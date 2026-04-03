@@ -653,11 +653,12 @@ export default function Game() {
       <div className="arena-layout">
         {/* Left HUD */}
         <div className={`hud-peripheral left ${currentUser === 1 ? 'active' : ''}`}>
-          <div className="calibration-step">NEURAL SIGNATURE: {player1}</div>
+          <div className="calibration-step">{player1}</div>
           <div className="hud-score-large">{scores[1]} <span style={{ fontSize: '10px', opacity: 0.5 }}>PTS</span></div>
 
           <div className="energy-cell-group">
-            <div className="energy-label">ENERGY <span className={`hud-timer-val ${timers[1] <= 10 ? 'critical' : timers[1] <= 30 ? 'warning' : ''}`}>{formatTime(timers[1])}</span></div>
+            <div className="energy-label">ENERGY</div>
+            <div className={`hud-timer-val ${timers[1] <= 10 ? 'critical' : timers[1] <= 30 ? 'warning' : ''}`}>{formatTime(timers[1])}</div>
             <div className="energy-track">
               {[...Array(20)].map((_, i) => (
                 <div
@@ -673,7 +674,8 @@ export default function Game() {
           </div>
 
           <div className="energy-cell-group">
-            <div className="energy-label">STABILITY <span className={`hud-status-tag ${timers[1] <= 20 ? 'critical' : ''}`}>{timers[1] > 20 ? 'NOMINAL' : 'CRITICAL'}</span></div>
+            <div className="energy-label">STATUS</div>
+            <div className={`hud-status-tag ${timers[1] <= 20 ? 'critical' : ''}`}>{timers[1] > 20 ? 'NOMINAL' : 'CRITICAL'}</div>
             <div className="energy-track">
               <div
                 className="energy-segment filled"
@@ -688,7 +690,7 @@ export default function Game() {
 
           {/* Power-Ups Dock - Player 1 */}
           <div className="powerups-dock">
-            <div className="powerups-label">TACTICAL SYSTEMS</div>
+            <div className="powerups-label">TACTICAL</div>
             <div className="powerups-grid">
               {renderPowerUpBtn(1, 'timeWarp', activateTimeWarp)}
               {renderPowerUpBtn(1, 'shield', activateShield)}
@@ -797,13 +799,13 @@ export default function Game() {
           </div>
         </div>
 
-        {/* Right HUD */}
         <div className={`hud-peripheral right ${currentUser === 2 ? 'active' : ''}`}>
-          <div className="calibration-step">NEURAL SIGNATURE: {player2}</div>
+          <div className="calibration-step">{player2}</div>
           <div className="hud-score-large">{scores[2]} <span style={{ fontSize: '10px', opacity: 0.5 }}>PTS</span></div>
 
           <div className="energy-cell-group">
-            <div className="energy-label">ENERGY <span className={`hud-timer-val ${timers[2] <= 10 ? 'critical' : timers[2] <= 30 ? 'warning' : ''}`}>{formatTime(timers[2])}</span></div>
+            <div className="energy-label">ENERGY</div>
+            <div className={`hud-timer-val ${timers[2] <= 10 ? 'critical' : timers[2] <= 30 ? 'warning' : ''}`}>{formatTime(timers[2])}</div>
             <div className="energy-track">
               {[...Array(20)].map((_, i) => (
                 <div
@@ -819,7 +821,8 @@ export default function Game() {
           </div>
 
           <div className="energy-cell-group">
-            <div className="energy-label">STABILITY <span className={`hud-status-tag ${timers[2] <= 20 ? 'critical' : ''}`}>{timers[2] > 20 ? 'NOMINAL' : 'CRITICAL'}</span></div>
+            <div className="energy-label">STATUS</div>
+            <div className={`hud-status-tag ${timers[2] <= 20 ? 'critical' : ''}`}>{timers[2] > 20 ? 'NOMINAL' : 'CRITICAL'}</div>
             <div className="energy-track">
               <div
                 className="energy-segment filled"
@@ -834,7 +837,7 @@ export default function Game() {
 
           {/* Power-Ups Dock - Player 2 */}
           <div className="powerups-dock">
-            <div className="powerups-label">TACTICAL SYSTEMS</div>
+            <div className="powerups-label">TACTICAL</div>
             <div className="powerups-grid">
               {renderPowerUpBtn(2, 'timeWarp', activateTimeWarp)}
               {renderPowerUpBtn(2, 'shield', activateShield)}

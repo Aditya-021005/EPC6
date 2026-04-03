@@ -664,23 +664,23 @@
   flex-direction: row;
   justify-content: center;
   align-items: stretch;
-  gap: 8px;
+  gap: 12px;
   width: 100vw;
   height: 100vh;
-  padding: 10px 16px;
+  padding: 16px 24px;
   overflow: hidden;
   perspective: 1200px;
 }
 
 .hud-peripheral {
-  flex: 0 0 clamp(120px, 8vw, 160px);
+  flex: 0 0 clamp(150px, 12vw, 200px);
   display: flex;
   flex-direction: column;
   gap: 16px;
   background: rgba(10, 15, 30, 0.68);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(0, 255, 255, 0.3);
-  padding: clamp(8px, 1vw, 14px);
+  padding: clamp(10px, 1.2vw, 16px);
   border-radius: 12px;
   position: relative;
   transition: all 0.4s ease;
@@ -741,13 +741,17 @@
 
 .calibration-step {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--text-secondary);
   font-weight: 700;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .active .calibration-step {
@@ -773,32 +777,30 @@
 .energy-cell-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .energy-label {
-  font-size: clamp(9px, 1vw, 11px);
+  font-size: 9px;
   font-family: var(--font-display);
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 2px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 0;
 }
 
 .hud-timer-val {
-  font-size: clamp(22px, 2vw, 28px);
+  font-size: clamp(18px, 1.8vw, 24px);
   font-weight: 900;
   color: var(--cyan);
   text-shadow: 0 0 15px var(--cyan-glow);
-  padding: 8px 16px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(0, 255, 255, 0.2);
-  border-radius: 8px;
-  min-width: clamp(100px, 8vw, 120px);
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 255, 0.25);
+  border-radius: 6px;
   text-align: center;
-  margin-left: 12px;
+  width: 100%;
+  box-sizing: border-box;
   transition: all 0.3s ease;
 }
 
@@ -821,11 +823,14 @@
   font-weight: 800;
   color: var(--cyan);
   background: rgba(0, 255, 255, 0.1);
-  padding: 2px 6px;
+  padding: 4px 8px;
   border: 1px solid rgba(0, 255, 255, 0.3);
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .hud-status-tag.critical {
@@ -857,17 +862,18 @@
 }
 
 .hud-score-large {
-  font-size: 32px;
+  font-size: clamp(22px, 2.5vw, 32px);
   font-family: var(--font-display);
   font-weight: 900;
   color: var(--white);
   text-align: center;
-  margin: 10px 0;
+  margin: 6px 0;
 }
 
 /* Combat Node (Central Viewport) */
 .combat-node {
   flex: 1;
+  max-width: 1200px;
   min-width: 0;
   display: flex;
   flex-direction: column;
