@@ -649,7 +649,7 @@ export default function Game() {
           <div className="hud-score-large">{scores[1]} <span style={{ fontSize: '10px', opacity: 0.5 }}>PTS</span></div>
 
           <div className="energy-cell-group">
-            <div className="energy-label">NEURAL ENERGY <span className={`hud-timer-val ${timers[1] <= 10 ? 'critical' : timers[1] <= 30 ? 'warning' : ''}`}>{formatTime(timers[1])}</span></div>
+            <div className="energy-label">ENERGY <span className={`hud-timer-val ${timers[1] <= 10 ? 'critical' : timers[1] <= 30 ? 'warning' : ''}`}>{formatTime(timers[1])}</span></div>
             <div className="energy-track">
               {[...Array(20)].map((_, i) => (
                 <div
@@ -665,7 +665,7 @@ export default function Game() {
           </div>
 
           <div className="energy-cell-group">
-            <div className="energy-label">UPLINK STABILITY <span className={`hud-status-tag ${timers[1] <= 20 ? 'critical' : ''}`}>{timers[1] > 20 ? 'NOMINAL' : 'CRITICAL'}</span></div>
+            <div className="energy-label">STABILITY <span className={`hud-status-tag ${timers[1] <= 20 ? 'critical' : ''}`}>{timers[1] > 20 ? 'NOMINAL' : 'CRITICAL'}</span></div>
             <div className="energy-track">
               <div
                 className="energy-segment filled"
@@ -790,7 +790,7 @@ export default function Game() {
           <div className="hud-score-large">{scores[2]} <span style={{ fontSize: '10px', opacity: 0.5 }}>PTS</span></div>
 
           <div className="energy-cell-group">
-            <div className="energy-label">NEURAL ENERGY <span className={`hud-timer-val ${timers[2] <= 10 ? 'critical' : timers[2] <= 30 ? 'warning' : ''}`}>{formatTime(timers[2])}</span></div>
+            <div className="energy-label">ENERGY <span className={`hud-timer-val ${timers[2] <= 10 ? 'critical' : timers[2] <= 30 ? 'warning' : ''}`}>{formatTime(timers[2])}</span></div>
             <div className="energy-track">
               {[...Array(20)].map((_, i) => (
                 <div
@@ -806,7 +806,7 @@ export default function Game() {
           </div>
 
           <div className="energy-cell-group">
-            <div className="energy-label">UPLINK STABILITY <span className={`hud-status-tag ${timers[2] <= 20 ? 'critical' : ''}`}>{timers[2] > 20 ? 'NOMINAL' : 'CRITICAL'}</span></div>
+            <div className="energy-label">STABILITY <span className={`hud-status-tag ${timers[2] <= 20 ? 'critical' : ''}`}>{timers[2] > 20 ? 'NOMINAL' : 'CRITICAL'}</span></div>
             <div className="energy-track">
               <div
                 className="energy-segment filled"

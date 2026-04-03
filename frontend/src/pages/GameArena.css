@@ -5,13 +5,13 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 24px;
+  gap: 12px;
   width: 100%;
-  max-width: 2000px;
+  max-width: 2500px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
-  padding: 40px;
+  padding: 20px 40px;
   perspective: 1200px;
 }
 
@@ -542,15 +542,15 @@
 
 .streak-milestone-text {
   font-family: var(--font-display);
-  font-size: 58px;
+  font-size: 72px;
   font-weight: 900;
-  letter-spacing: 8px;
+  letter-spacing: 12px;
   color: var(--gold);
   text-shadow:
-    0 0 25px var(--gold-glow),
-    0 0 70px var(--gold-glow),
-    0 0 120px rgba(255, 204, 0, 0.3);
-  padding: 25px 80px;
+    0 0 35px var(--gold-glow),
+    0 0 90px var(--gold-glow),
+    0 0 150px rgba(255, 204, 0, 0.4);
+  padding: 35px 100px;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   border: 2px solid rgba(255, 204, 0, 0.4);
@@ -665,23 +665,23 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 24px;
+  gap: 12px;
   width: 100vw;
   height: 100vh;
-  padding: 30px;
+  padding: 20px;
   overflow: hidden;
   perspective: 1200px;
 }
 
 .hud-peripheral {
-  flex: 0 0 clamp(180px, 15vw, 240px);
+  flex: 0 0 clamp(140px, 10vw, 180px);
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background: rgba(10, 15, 30, 0.65);
-  backdrop-filter: blur(18px);
-  border: 2px solid rgba(0, 255, 255, 0.2);
-  padding: clamp(15px, 2vw, 25px);
+  background: rgba(10, 15, 30, 0.68);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  padding: clamp(10px, 1.5vw, 20px);
   border-radius: 12px;
   position: relative;
   transition: all 0.4s ease;
@@ -793,13 +793,13 @@
   font-weight: 900;
   color: var(--cyan);
   text-shadow: 0 0 15px var(--cyan-glow);
-  padding: 4px 10px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(0, 255, 255, 0.15);
-  border-radius: 6px;
-  min-width: clamp(70px, 6vw, 90px);
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 8px;
+  min-width: clamp(100px, 8vw, 120px);
   text-align: center;
-  margin-left: 10px;
+  margin-left: 12px;
   transition: all 0.3s ease;
 }
 
@@ -869,7 +869,7 @@
 /* Combat Node (Central Viewport) */
 .combat-node {
   flex: 1;
-  max-width: 1600px;
+  max-width: 1900px;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 const AudioContext = createContext();
 
 export const AudioProvider = ({ children }) => {
-  const [globalVolume, setGlobalVolume] = useState(0.2);
+  const [globalVolume, setGlobalVolume] = useState(0.8);
   const [isUnlocked, setIsUnlocked] = useState(false);
 
   const unlockAudio = useCallback(() => {
