@@ -5,9 +5,9 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 40px;
+  gap: 24px;
   width: 100%;
-  max-width: 1400px;
+  max-width: 2000px;
   margin: 0 auto;
   position: relative;
   z-index: 10;
@@ -203,13 +203,13 @@
 
 .feedback-message {
   font-family: var(--font-display);
-  font-size: clamp(14px, 2.5vw, 28px);
+  font-size: clamp(16px, 3.5vw, 42px);
   font-weight: 900;
   letter-spacing: clamp(1px, 0.5vw, 4px);
   text-transform: uppercase;
-  padding: clamp(12px, 2vw, 24px) clamp(20px, 3vw, 48px);
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
+  padding: clamp(16px, 3vw, 36px) clamp(24px, 4vw, 64px);
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(12px);
   clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
   animation: feedbackPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   max-width: 90%;
@@ -217,6 +217,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
 .correct-msg {
@@ -276,25 +277,31 @@
 /* Pause Overlay Premium */
 .paused-screen {
   position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  z-index: 20;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 500;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
+  text-align: center;
 }
 
 .paused-text {
   font-family: var(--font-display);
-  font-size: clamp(24px, 4vw, 42px);
+  font-size: clamp(28px, 5vw, 54px);
   font-weight: 900;
-  letter-spacing: clamp(6px, 1vw, 12px);
+  letter-spacing: clamp(10px, 2vw, 18px);
   color: var(--gold);
-  text-shadow: 0 0 20px var(--gold-glow);
+  text-shadow: 0 0 30px var(--gold-glow);
   animation: pulseStatic 2s infinite;
+  margin: 0;
+  padding: 0;
 }
 
 /* Controls */
@@ -502,15 +509,15 @@
 /* --- Advanced Gameplay Effects --- */
 .combo-display {
   position: absolute;
-  top: -40px;
+  top: -60px;
   right: 0;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: 24px;
+  font-size: 36px;
   color: var(--gold);
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(15px);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -535,15 +542,15 @@
 
 .streak-milestone-text {
   font-family: var(--font-display);
-  font-size: 42px;
+  font-size: 58px;
   font-weight: 900;
-  letter-spacing: 6px;
+  letter-spacing: 8px;
   color: var(--gold);
   text-shadow:
-    0 0 20px var(--gold-glow),
-    0 0 60px var(--gold-glow),
-    0 0 100px rgba(255, 204, 0, 0.2);
-  padding: 20px 60px;
+    0 0 25px var(--gold-glow),
+    0 0 70px var(--gold-glow),
+    0 0 120px rgba(255, 204, 0, 0.3);
+  padding: 25px 80px;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   border: 2px solid rgba(255, 204, 0, 0.4);
@@ -667,15 +674,14 @@
 }
 
 .hud-peripheral {
-  width: 280px;
-  min-width: 240px;
+  flex: 0 0 clamp(180px, 15vw, 240px);
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background: rgba(10, 15, 30, 0.6);
-  backdrop-filter: blur(15px);
+  background: rgba(10, 15, 30, 0.65);
+  backdrop-filter: blur(18px);
   border: 2px solid rgba(0, 255, 255, 0.2);
-  padding: 25px;
+  padding: clamp(15px, 2vw, 25px);
   border-radius: 12px;
   position: relative;
   transition: all 0.4s ease;
@@ -772,16 +778,62 @@
 }
 
 .energy-label {
-  font-size: 10px;
+  font-size: clamp(9px, 1vw, 11px);
   font-family: var(--font-display);
   color: rgba(255, 255, 255, 0.5);
   letter-spacing: 2px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
 }
 
-.energy-label span {
+.hud-timer-val {
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 900;
   color: var(--cyan);
+  text-shadow: 0 0 15px var(--cyan-glow);
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  border-radius: 6px;
+  min-width: clamp(70px, 6vw, 90px);
+  text-align: center;
+  margin-left: 10px;
+  transition: all 0.3s ease;
+}
+
+.hud-timer-val.warning {
+  color: var(--gold);
+  border-color: rgba(255, 204, 0, 0.4);
+  text-shadow: 0 0 15px var(--gold-glow);
+  animation: warningPulse 1s infinite alternate;
+}
+
+.hud-timer-val.critical {
+  color: var(--red);
+  border-color: rgba(255, 0, 0, 0.5);
+  text-shadow: 0 0 15px var(--red-glow);
+  animation: warningPulse 0.5s infinite alternate;
+}
+
+.hud-status-tag {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--cyan);
+  background: rgba(0, 255, 255, 0.1);
+  padding: 2px 6px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.hud-status-tag.critical {
+  color: var(--red);
+  background: rgba(255, 0, 0, 0.15);
+  border-color: rgba(255, 0, 0, 0.5);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
 }
 
 .energy-track {
@@ -817,7 +869,7 @@
 /* Combat Node (Central Viewport) */
 .combat-node {
   flex: 1;
-  max-width: 900px;
+  max-width: 1600px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1928,10 +1980,10 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0, 240, 255, 0.05);
-  border: 1px solid rgba(0, 240, 255, 0.15);
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.3);
   border-radius: 100px;
-  padding: 5px 16px;
+  padding: 6px 20px;
   margin-bottom: 14px;
   font-family: var(--font-display);
   font-size: 9px;
@@ -1978,10 +2030,11 @@
 
 .briefing-subtitle {
   font-family: var(--font-display);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 4px;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 24px;
+  text-transform: uppercase;
 }
 
 /* Briefing Cards Grid */
@@ -1995,8 +2048,8 @@
 
 .briefing-card {
   position: relative;
-  background: rgba(10, 14, 30, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(8, 12, 28, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   padding: 20px;
   overflow: hidden;
@@ -2061,14 +2114,14 @@
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 3px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
   margin-bottom: 10px;
 }
 
 .briefing-card-text {
   font-family: var(--font-body);
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
   font-weight: 500;
 }
@@ -2091,7 +2144,7 @@
   gap: 10px;
   font-family: var(--font-body);
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
 }
 
@@ -2140,9 +2193,9 @@
 
 .briefing-pilot-label {
   font-family: var(--font-display);
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 3px;
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 700;
 }
 
@@ -2285,8 +2338,8 @@
   }
 
   .combat-node {
-    max-width: 600px;
-    /* Constraining width forces aspect-ratio to yield smaller height */
+    max-width: 780px;
+    /* Increased for bigger display on shorter screens */
   }
 
   .arena-actions-bar {
@@ -2301,7 +2354,7 @@
 
 @media (max-height: 700px) {
   .combat-node {
-    max-width: 500px;
+    max-width: 650px;
   }
 
   .hud-peripheral {
@@ -2312,7 +2365,7 @@
 
 @media (max-height: 600px) {
   .combat-node {
-    max-width: 400px;
+    max-width: 520px;
   }
 
   .hud-peripheral {

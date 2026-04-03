@@ -1,6 +1,11 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { useAudio } from '../context/AudioContext';
 
+const ALLOWED_SOUNDS = [
+  '/sounds/correct.mp3',
+  '/sounds/wrong.mp3'
+];
+
 const useSound = (src, options = {}) => {
   const { volume: localVolume = 1, loop = false } = options;
   const { globalVolume, isUnlocked } = useAudio();
@@ -8,6 +13,11 @@ const useSound = (src, options = {}) => {
   const wasBlockedRef = useRef(false);
 
   useEffect(() => {
+    // Only initialize the audio object if the sound is allowed
+    if (!ALLOWED_SOUNDS.includes(src)) {
+      return;
+    }
+
     const audio = new Audio(src);
     audio.loop = loop;
     audio.preload = 'auto'; // Reduce lag by preloading
@@ -34,6 +44,9 @@ const useSound = (src, options = {}) => {
 
   const play = useCallback(() => {
     if (!audioRef.current) return;
+
+    // Double check allowed sounds for extra safety
+    if (!ALLOWED_SOUNDS.includes(src)) return;
 
     // Reset and play
     audioRef.current.currentTime = 0;
@@ -70,3 +83,4 @@ const useSound = (src, options = {}) => {
 };
 
 export default useSound;
+
