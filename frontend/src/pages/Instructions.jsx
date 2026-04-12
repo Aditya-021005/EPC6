@@ -51,7 +51,7 @@ export default function Instructions() {
             <div className="inst-rule-num">03</div>
             <div className="inst-rule-body">
               <div className="inst-rule-label">TIMER MECHANICS</div>
-              <div className="inst-rule-text">Each operator has 120s of Neural Energy. Correct IDs grant +5s. Fails drain -5s. When your timer hits zero, the round ends.</div>
+              <div className="inst-rule-text">Each operator has 60s of Neural Energy. Correct IDs grant +5s. Fails drain -5s. When your timer hits zero, the round ends.</div>
             </div>
           </div>
         </div>

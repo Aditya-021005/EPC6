@@ -37,7 +37,7 @@ export default function Game() {
   const [quizMeta, setQuizMeta] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState(1);
-  const [timers, setTimers] = useState({ 1: 120, 2: 120 });
+  const [timers, setTimers] = useState({ 1: 60, 2: 60 });
   const [scores, setScores] = useState(savedScores || { 1: 0, 2: 0 });
   const [isPaused, setIsPaused] = useState(false);
   const [isAnswerShown, setIsAnswerShown] = useState(false);
@@ -80,7 +80,7 @@ export default function Game() {
     isPaused: false,
     isAnswerShown: false,
     roundOver: false,
-    timers: { 1: 120, 2: 120 },
+    timers: { 1: 60, 2: 60 },
     scores: savedScores || { 1: 0, 2: 0 },
     questions: [],
     currentIndex: 0,
@@ -685,7 +685,7 @@ export default function Game() {
               <div
                 className="energy-segment filled"
                 style={{
-                  width: `${Math.min(100, (timers[1] / 120) * 100)}%`,
+                  width: `${Math.min(100, (timers[1] / 60) * 100)}%`,
                   backgroundColor: timers[1] <= 20 ? 'var(--red)' : 'var(--cyan)',
                   boxShadow: `0 0 15px ${timers[1] <= 20 ? 'var(--red)' : 'var(--cyan)'}`
                 }}
@@ -832,7 +832,7 @@ export default function Game() {
               <div
                 className="energy-segment filled"
                 style={{
-                  width: `${Math.min(100, (timers[2] / 120) * 100)}%`,
+                  width: `${Math.min(100, (timers[2] / 60) * 100)}%`,
                   backgroundColor: timers[2] <= 20 ? 'var(--red)' : 'var(--cyan)',
                   boxShadow: `0 0 15px ${timers[2] <= 20 ? 'var(--red)' : 'var(--cyan)'}`
                 }}
